@@ -1,5 +1,4 @@
 import { loadStripe } from '@stripe/stripe-js';
-import config from '../config/environment';
 
 // Stripe configuration - Live keys
 const STRIPE_PUBLISHABLE_KEY = 'pk_live_51Rxm5xRoRmnrtidggbBqABsqH839S7iN1UoodLKBs3yi6Y25CHJLSE9AT6H5XpyahRV5I56IoQt0i8rAsRBXezVu00ixCbtnzc';
