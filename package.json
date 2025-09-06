@@ -3,12 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
+ "scripts": {
+  "dev": "vite",
+  "build": "tsc && vite build --mode production",
+  "lint": "eslint .",
+  "preview": "vite preview"
+}
   "dependencies": {
     "@stripe/stripe-js": "^7.9.0",
     "@supabase/supabase-js": "^2.56.1",
