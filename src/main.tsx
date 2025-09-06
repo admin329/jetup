@@ -3,10 +3,10 @@ import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import App from './App.tsx';
 import './index.css';
-import './test/paymentTest';
-import './test/emailTest';
-import './test/stripeTest';
 import { initializeEnvironment } from './config/environment';
+    <HelmetProvider>
+      <App />
+    </HelmetProvider>
 import { setupGlobalErrorHandler } from './utils/errorHandler';
 import { initializeSecurity } from './utils/security';
 import { initializeTwoFactorService } from './services/twoFactorService';
