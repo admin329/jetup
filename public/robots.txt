@@ -1,0 +1,48 @@
+# JETUP - Official Private Flight Network - Robots.txt
+User-agent: *
+Allow: /
+
+# Allow JETUP brand searches
+Allow: /jetup
+Allow: /JETUP
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /customer/
+Disallow: /operator/
+Disallow: /api/
+Disallow: /confirm-email
+Disallow: /reset-password
+
+# Allow important pages
+Allow: /
+Allow: /membership
+Allow: /aircrafts
+Allow: /routes
+Allow: /operators
+Allow: /experience
+Allow: /fleet
+Allow: /support
+Allow: /booking
+Allow: /legal
+Allow: /privacy
+Allow: /terms-of-use
+Allow: /disclaimer
+Allow: /cookies
+Allow: /charter-terms
+
+# Sitemap location
+Sitemap: https://jetup.aero/sitemap.xml
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1
+
+# Block common bot patterns
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
