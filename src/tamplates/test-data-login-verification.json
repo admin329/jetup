@@ -1,0 +1,8 @@
+{
+  "to_name": "John Smith",
+  "to_email": "john.smith@example.com",
+  "verification_code": "123456",
+  "login_time": "August 29, 2024 at 12:58 PM",
+  "login_ip": "192.168.1.100",
+  "device_info": "Chrome on macOS"
+}

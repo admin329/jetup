@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JETUP Login Verification Code</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f8fafc;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #0B1733;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header-title {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 20px 0 0 0;
+        }
+        .header-subtitle {
+            color: #e2e8f0;
+            font-size: 16px;
+            margin: 10px 0 0 0;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .verification-text {
+            font-size: 18px;
+            color: #1f2937;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .user-info {
+            background-color: #f1f5f9;
+            border-left: 4px solid #0B1733;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .user-info h3 {
+            color: #0B1733;
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        .user-info p {
+            margin: 5px 0;
+            color: #4b5563;
+        }
+        .verification-code {
+            background-color: #0B1733;
+            color: #ffffff;
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        .code-instructions {
+            background-color: #dbeafe;
+            border: 2px solid #3b82f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .code-instructions h4 {
+            color: #1e40af;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .code-instructions p {
+            margin: 0;
+            color: #1e3a8a;
+            font-size: 14px;
+        }
+        .security-notice {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .security-notice h3 {
+            color: #dc2626;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+        .security-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .security-list li {
+            padding: 8px 0;
+            color: #7f1d1d;
+            position: relative;
+            padding-left: 25px;
+            font-size: 14px;
+        }
+        .security-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            top: 8px;
+            font-weight: bold;
+        }
+        .footer {
+            background-color: #0B1733;
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+        }
+        .company-info {
+            font-size: 14px;
+            color: #e2e8f0;
+            margin-bottom: 15px;
+        }
+        .contact-info {
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+        .social-links {
+            margin: 20px 0;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #ffffff;
+            text-decoration: none;
+        }
+        @media only screen and (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            .header {
+                padding: 30px 20px;
+            }
+            .content {
+                padding: 30px 20px;
+            }
+            .header-title {
+                font-size: 24px;
+            }
+            .verification-code {
+                font-size: 28px;
+                letter-spacing: 4px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <img src="https://jetup.aero/Up-app-logo.png" alt="JETUP" style="width: 60px; height: auto; margin-bottom: 20px;">
+            <h1 class="header-title">Login Verification</h1>
+            <p class="header-subtitle">Security Code Required</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <p class="verification-text">
+                Hello <strong>{{to_name}}</strong>,
+            </p>
+            
+            <p style="color: #4b5563; font-size: 16px; margin-bottom: 20px; text-align: center;">
+                We detected a login attempt to your JETUP account. Please use the verification code below to complete your login:
+            </p>
+
+            <div class="user-info">
+                <h3>Login Attempt Details</h3>
+                <p><strong>Account:</strong> {{to_email}}</p>
+                <p><strong>Login Time:</strong> {{login_time}}</p>
+                <p><strong>IP Address:</strong> {{login_ip}}</p>
+                <p><strong>Device:</strong> {{device_info}}</p>
+            </div>
+
+            <div class="verification-code">
+                {{verification_code}}
+            </div>
+
+            <div class="code-instructions">
+                <h4>How to Use This Code</h4>
+                <p>Enter this 6-digit code in the verification field on your login screen.<br>
+                This code is valid for 10 minutes only.</p>
+            </div>
+
+            <div class="security-notice">
+                <h3>Security Information</h3>
+                <ul class="security-list">
+                    <li>This code expires in 10 minutes for your security</li>
+                    <li>Never share this code with anyone</li>
+                    <li>If you didn't attempt to login, change your password immediately</li>
+                    <li>Contact support if you suspect unauthorized access</li>
+                    <li>JETUP will never ask for this code via email or phone</li>
+                </ul>
+            </div>
+
+            <p style="color: #6b7280; font-size: 14px; text-align: center; margin-top: 30px;">
+                If you didn't attempt to login to your JETUP account, please ignore this email and consider changing your password for security.
+            </p>
+
+            <p style="color: #6b7280; font-size: 14px; text-align: center; margin-top: 20px;">
+                Need help? Contact our 24/7 security team:<br>
+                <strong>Email:</strong> support@jetup.aero | <strong>Phone:</strong> +1 888 565 6090
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <img src="https://jetup.aero/Up-app-logo.png" alt="JETUP" style="width: 60px; height: auto; margin-bottom: 15px;">
+            
+            <div class="company-info">
+                <strong>JETUP LTD (UK)</strong><br>
+                Private Flight Network Security Team
+            </div>
+            
+            <div class="contact-info">
+                27 Old Gloucester Street, London, United Kingdom, WC1N 3AX<br>
+                Email: support@jetup.aero | Phone: +1 888 565 6090<br>
+                Company ID: 16643231
+            </div>
+
+            <div class="social-links">
+                <a href="https://www.instagram.com/jetupaero/">Instagram</a> |
+                <a href="https://x.com/jetupaero/">Twitter</a> |
+                <a href="https://www.youtube.com/@jetupaero">YouTube</a>
+            </div>
+
+            <p style="font-size: 11px; color: #94a3b8; margin-top: 15px;">
+                © 2025 JETUP LTD (UK). All rights reserved.<br>
+                This is an automated security email. Please do not reply.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

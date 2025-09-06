@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to JETUP - Operator Account</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f8fafc;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #0B1733;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header-title {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 20px 0 0 0;
+        }
+        .header-subtitle {
+            color: #e2e8f0;
+            font-size: 16px;
+            margin: 10px 0 0 0;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .welcome-text {
+            color: #1f2937;
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .user-info {
+            background-color: #f1f5f9;
+            border-left: 4px solid #0B1733;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .user-info h3 {
+            color: #0B1733;
+            margin: 0 0 10px 0;
+            font-size: 16px;
+        }
+        .user-info p {
+            margin: 5px 0;
+            color: #4b5563;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #dc2626;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .steps-section {
+            background-color: #f0fdf4;
+            border: 2px solid #22c55e;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+        }
+        .steps-section h3 {
+            color: #15803d;
+            margin: 0 0 20px 0;
+            font-size: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .step-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .step-list li {
+            padding: 12px 0;
+            color: #15803d;
+            position: relative;
+            padding-left: 40px;
+            font-size: 15px;
+            font-weight: 500;
+            border-bottom: 1px solid #bbf7d0;
+        }
+        .step-list li:last-child {
+            border-bottom: none;
+        }
+        .step-list li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            top: 12px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .commission-highlight {
+            background-color: #dcfce7;
+            border: 2px solid #16a34a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .commission-highlight h4 {
+            color: #15803d;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .commission-highlight p {
+            margin: 0;
+            color: #166534;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .membership-plans {
+            background-color: #fef3c7;
+            border: 2px solid #f59e0b;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        .membership-plans h4 {
+            color: #92400e;
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .plan-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .plan-item {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #d97706;
+        }
+        .plan-item h5 {
+            color: #92400e;
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .plan-item p {
+            margin: 0;
+            color: #78350f;
+            font-size: 13px;
+        }
+        .footer {
+            background-color: #0B1733;
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+        }
+        .company-info {
+            font-size: 14px;
+            color: #e2e8f0;
+            margin-bottom: 15px;
+        }
+        .contact-info {
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+        .social-links {
+            margin: 20px 0;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #ffffff;
+            text-decoration: none;
+        }
+        @media only screen and (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+            .header {
+                padding: 30px 20px;
+            }
+            .content {
+                padding: 30px 20px;
+            }
+            .header-title {
+                font-size: 24px;
+            }
+            .cta-button {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            .plan-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <img src="https://jetup.aero/Up-app-logo.png" alt="JETUP" style="width: 60px; height: auto; margin-bottom: 20px;">
+            <h1 class="header-title">Welcome to JETUP!</h1>
+            <p class="header-subtitle">Private Flight Network - Operator Portal</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <p class="welcome-text">
+                Hello <strong>{{to_name}}</strong>,
+            </p>
+            
+            <p style="color: #4b5563; font-size: 16px; margin-bottom: 20px; text-align: center;">
+                Welcome to the JETUP Private Flight Network! We're excited to have you join our premium aviation community as a Flight Operator.
+            </p>
+
+            <div class="user-info">
+                <h3>Operator Account Information</h3>
+                <p><strong>Company Name:</strong> {{to_name}}</p>
+                <p><strong>Email:</strong> {{to_email}}</p>
+                <p><strong>Account Type:</strong> Flight Operator</p>
+                <p><strong>Operator ID:</strong> Will be assigned after verification</p>
+            </div>
+
+            <p style="color: #4b5563; font-size: 16px; margin: 20px 0; text-align: center;">
+                To complete your registration and activate your operator account, please click the button below to confirm your email address:
+            </p>
+
+            <div class="button-container">
+                <a href="{{confirmation_link}}" class="cta-button">
+                    Confirm Email Address
+                </a>
+            </div>
+
+            <div class="steps-section">
+                <h3>Next Steps for Operator Account</h3>
+                <ul class="step-list">
+                    <li><strong>Step 1:</strong> Upload your AOC (Air Operator Certificate) license</li>
+                    <li><strong>Step 2:</strong> Wait for admin verification (24-48 hours)</li>
+                    <li><strong>Step 3:</strong> Choose an operator membership plan</li>
+                    <li><strong>Step 4:</strong> Add your aircraft fleet to our network</li>
+                    <li><strong>Step 5:</strong> Create popular route offers</li>
+                    <li><strong>Step 6:</strong> Start receiving booking requests from customers</li>
+                </ul>
+            </div>
+
+            <div class="commission-highlight">
+                <h4>Zero Commission Policy</h4>
+                <p>Keep 100% of your revenue with our 0% commission rate!</p>
+            </div>
+
+            <div class="membership-plans">
+                <h4>Operator Membership Plans</h4>
+                <p style="color: #78350f; margin-bottom: 15px;">Choose the plan that fits your business needs:</p>
+                <div class="plan-grid">
+                    <div class="plan-item">
+                        <h5>Monthly Plan</h5>
+                        <p><strong>$2,450/month</strong><br>Perfect for getting started</p>
+                    </div>
+                    <div class="plan-item">
+                        <h5>Yearly Plan (Popular)</h5>
+                        <p><strong>$14,700/year</strong><br>Save 50% - Best value!</p>
+                    </div>
+                </div>
+            </div>
+
+            <p style="color: #6b7280; font-size: 14px; text-align: center; margin-top: 30px;">
+                If the button doesn't work, copy and paste this link into your browser:<br>
+                <a href="{{confirmation_link}}" style="color: #dc2626; word-break: break-all;">{{confirmation_link}}</a>
+            </p>
+
+            <p style="color: #6b7280; font-size: 14px; text-align: center; margin-top: 20px;">
+                Need help? Contact our 24/7 operator support:<br>
+                <strong>Email:</strong> support@jetup.aero | <strong>Phone:</strong> +1 888 565 6090
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <img src="https://jetup.aero/Up-app-logo.png" alt="JETUP" style="width: 60px; height: auto; margin-bottom: 15px;">
+            
+            <div class="company-info">
+                <strong>JETUP LTD (UK)</strong><br>
+                Private Flight Network - Operator Services
+            </div>
+            
+            <div class="contact-info">
+                27 Old Gloucester Street, London, United Kingdom, WC1N 3AX<br>
+                Email: support@jetup.aero | Phone: +1 888 565 6090<br>
+                Company ID: 16643231
+            </div>
+
+            <div class="social-links">
+                <a href="https://www.instagram.com/jetupaero/">Instagram</a> |
+                <a href="https://x.com/jetupaero/">Twitter</a> |
+                <a href="https://www.youtube.com/@jetupaero">YouTube</a>
+            </div>
+
+            <p style="font-size: 11px; color: #94a3b8; margin-top: 15px;">
+                © 2025 JETUP LTD (UK). All rights reserved.<br>
+                You received this email because you registered for a JETUP operator account.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

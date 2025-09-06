@@ -1,1 +1,5 @@
-
+{
+  "to_name": "John Smith",
+  "to_email": "john.smith@example.com",
+  "confirmation_link": "https://jetup.aero/confirm-email?token=demo-token-123456"
+}
