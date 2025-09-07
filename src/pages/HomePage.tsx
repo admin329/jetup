@@ -1,273 +1,999 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Plane, Users, Shield, Star, Crown, ArrowRight, CheckCircle, Globe, Award, Clock, Phone, Mail, MessageCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Plane, Star, Shield, Clock, Crown, Users, MapPin, Award, MessageCircle, ArrowRight, Filter, Phone, Search, Mail, CheckCircle, Globe, Building, DollarSign, Calendar, Eye, Download, FileText } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import SEOHead from '../components/SEOHead';
+import StructuredData from '../components/StructuredData';
 import Header from '../components/Header';
 import BookingForm from '../components/BookingForm';
+import AircraftCard from '../components/AircraftCard';
+import RouteCard from '../components/RouteCard';
 
 const HomePage: React.FC = () => {
+  const { isAuthenticated, user } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [isSubscribing, setIsSubscribing] = useState(false);
-  const [subscriptionSuccess, setSubscriptionSuccess] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [routeSearchTerm, setRouteSearchTerm] = useState('');
+  const [selectedDepartureCity, setSelectedDepartureCity] = useState('');
+  const [selectedPriceRange, setSelectedPriceRange] = useState('');
 
-  const handleNewsletterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubscribing(true);
+  // Check if user is operator or admin
+  const isOperatorOrAdmin = user?.role === 'operator' || user?.role === 'admin';
 
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Here you would make the actual API call to subscribe
-      console.log('Newsletter subscription:', newsletterEmail);
-      
-      setSubscriptionSuccess(true);
-      setNewsletterEmail('');
-      
-      // Reset success message after 3 seconds
-      setTimeout(() => setSubscriptionSuccess(false), 3000);
-    } catch (error) {
-      console.error('Newsletter subscription failed:', error);
-      alert('Subscription failed. Please try again.');
-    } finally {
-      setIsSubscribing(false);
+  const handleRequestQuote = () => {
+    // Prevent operators and admins from booking
+    if (isOperatorOrAdmin) {
+      return;
+    }
+    
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+    } else {
+      // Redirect to booking page for authenticated users
+      window.location.href = '/booking';
     }
   };
 
-  const features = [
+  const aircraftData = [
     {
-      icon: Plane,
-      title: '1000+ Verified Aircraft',
-      description: 'Access to the world\'s largest network of certified private jets'
+      id: '1',
+      name: 'Gulfstream G650',
+      type: 'Heavy Jet',
+      capacity: 14,
+      range: '7000 nm',
+      speed: '516 kts',
+      image: 'https://images.pexels.com/photos/358319/pexels-photo-358319.jpeg?auto=compress&cs=tinysrgb&w=800',
+      operator: 'Premium Aviation Ltd.',
+      country: 'United States'
     },
     {
-      icon: Users,
-      title: '500+ Approved Operators',
-      description: 'Vetted operators with valid licenses and insurance coverage'
+      id: '2',
+      name: 'Cessna Citation X+',
+      type: 'Super Mid-size',
+      capacity: 9,
+      range: '3408 nm',
+      speed: '527 kts',
+      image: 'https://images.pexels.com/photos/46148/aircraft-jet-landing-cloud-46148.jpeg?auto=compress&cs=tinysrgb&w=800',
+      operator: 'Elite Jets Inc.',
+      country: 'United Kingdom'
     },
     {
-      icon: Shield,
-      title: 'Zero Commission',
-      description: 'Direct booking with operators - no hidden fees or commissions'
-    },
-    {
-      icon: Star,
-      title: '24/7 Expert Support',
-      description: 'Aviation experts available around the clock for assistance'
+      id: '3',
+      name: 'Bombardier Global 7500',
+      type: 'Ultra Long Range',
+      capacity: 19,
+      range: '7700 nm',
+      speed: '516 kts',
+      image: 'https://images.pexels.com/photos/723240/pexels-photo-723240.jpeg?auto=compress&cs=tinysrgb&w=800',
+      operator: 'Luxury Air Services',
+      country: 'Canada'
     }
   ];
 
-  const benefits = [
+  const countries = ['United States', 'United Kingdom', 'Canada', 'Germany', 'France'];
+  const categories = ['Light Jet', 'Super Mid-size', 'Heavy Jet', 'Ultra Long Range'];
+
+  const filteredAircraft = aircraftData.filter(aircraft => {
+    const matchesSearch = aircraft.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         aircraft.operator.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCountry = selectedCountry === '' || aircraft.country === selectedCountry;
+    const matchesCategory = selectedCategory === '' || aircraft.type === selectedCategory;
+    
+    return matchesSearch && matchesCountry && matchesCategory;
+  });
+
+  const departureCities = ['New York', 'London', 'Miami'];
+  const priceRanges = ['Under $20,000', '$20,000 - $30,000', '$30,000 - $40,000', 'Over $40,000'];
+
+  const popularRoutes = [
     {
-      icon: Crown,
-      title: 'Premium Experience',
-      description: 'Luxury travel with personalized service and attention to detail'
+      id: '1',
+      from: 'New York',
+      to: 'Los Angeles',
+      duration: '6h 30m',
+      price: '$25,000',
+      aircraft: 'Gulfstream G650',
+      operator: 'Premium Aviation Ltd.',
+      rating: 4.9
     },
     {
-      icon: Globe,
-      title: 'Global Network',
-      description: 'Access to over 5,000 airports worldwide'
+      id: '2',
+      from: 'London',
+      to: 'Dubai',
+      duration: '7h 15m',
+      price: '$32,000',
+      aircraft: 'Bombardier Global 7500',
+      operator: 'Elite Jets Inc.',
+      rating: 4.8
     },
     {
-      icon: Award,
-      title: 'Safety First',
-      description: 'Rigorous safety standards and certified operators'
-    },
-    {
-      icon: Clock,
-      title: 'Time Efficiency',
-      description: 'Save time with direct flights and flexible scheduling'
+      id: '3',
+      from: 'Miami',
+      to: 'Aspen',
+      duration: '4h 45m',
+      price: '$18,500',
+      aircraft: 'Cessna Citation X+',
+      operator: 'Luxury Air Services',
+      rating: 4.7
     }
   ];
+
+  const filteredRoutes = popularRoutes.filter(route => {
+    const matchesSearch = route.from.toLowerCase().includes(routeSearchTerm.toLowerCase()) ||
+                         route.to.toLowerCase().includes(routeSearchTerm.toLowerCase()) ||
+                         route.aircraft.toLowerCase().includes(routeSearchTerm.toLowerCase());
+    const matchesDeparture = selectedDepartureCity === '' || route.from === selectedDepartureCity;
+    
+    let matchesPrice = true;
+    if (selectedPriceRange) {
+      const price = parseInt(route.price.replace(/[$,]/g, ''));
+      switch (selectedPriceRange) {
+        case 'Under $20,000':
+          matchesPrice = price < 20000;
+          break;
+        case '$20,000 - $30,000':
+          matchesPrice = price >= 20000 && price <= 30000;
+          break;
+        case '$30,000 - $40,000':
+          matchesPrice = price >= 30000 && price <= 40000;
+          break;
+        case 'Over $40,000':
+          matchesPrice = price > 40000;
+          break;
+      }
+    }
+    
+    return matchesSearch && matchesDeparture && matchesPrice;
+  });
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <SEOHead
-        title="JETUP | Official Private Flight Network | Luxury Private Jet Charter"
-        description="JETUP - The official private flight network connecting premium customers with verified operators worldwide. Book luxury private flights with 0% commission, 1000+ aircraft, and 24/7 support."
-        keywords="JETUP, private jet charter, luxury flights, business aviation, private aircraft, jet rental, charter flights, premium travel, aviation network"
+        title="JETUP - Private Flight Network"
+        description="JETUP - The official private flight network connecting premium customers with verified operators worldwide. JETUP offers luxury private jet charter with 0% commission, 1000+ aircraft, and 24/7 expert support."
+        keywords="JETUP, JETUP private jets, JETUP aviation, JETUP flight network, JETUP charter, private jet charter, luxury flights, business aviation, private aircraft, jet rental"
         url="/"
         image="/JETUP-Photo-01.jpg"
       />
       
+      <StructuredData type="organization" data={{}} />
+      <StructuredData type="service" data={{}} />
+      
       <Header showAuthModal={showAuthModal} setShowAuthModal={setShowAuthModal} />
       
-      {/* Hero Section */}
-      <section 
-        className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: 'linear-gradient(rgba(11, 23, 51, 0.7), rgba(11, 23, 51, 0.7)), url(/JETUP-Photo-01.jpg)'
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
+      {/* Hero Section with Video Background */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pb-[55rem] sm:pb-60 lg:pb-0">
+        {/* Mobile Gradient Background */}
+        <div className="absolute inset-0 z-10 lg:hidden bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900"></div>
+        
+        {/* Desktop Video Background */}
+        <div className="hidden lg:block absolute inset-0 z-10" style={{backgroundColor: 'rgba(11, 23, 51, 0.5)'}}></div>
+        <video
+          className="hidden lg:block absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+        >
+          <source src="https://video.wixstatic.com/video/6c67ce_9bd85eca8a30490db18a24d100f7be01/1080p/mp4/file.mp4" type="video/mp4" />
+        </video>
+        
+        <div 
+          className="absolute inset-0 z-15 pointer-events-none hidden lg:block" 
+          style={{
+            backgroundImage: 'radial-gradient(circle at center, black 1px, transparent 1px)',
+            backgroundSize: '3px 3px',
+            backgroundRepeat: 'repeat',
+            opacity: 0.5
+          }}
+        ></div>
+        
+        <div className="absolute z-20 text-white left-4 sm:left-8 lg:left-28 top-1/4 lg:top-1/2 transform -translate-y-1/2 lg:transform-none lg:top-80">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-left"
+          >
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 lg:mb-6">
+              <span className="text-3xl sm:text-4xl md:text-5xl">Private Flight Network</span>
+            </h1>
+            <p className="text-lg sm:text-xl md:text-2xl mb-6 lg:mb-8 font-light -mt-4 sm:-mt-0">
+              More Than Flight Experience
+            </p>
+            {/* Mobile - Text with Arrow */}
+            <div className="block sm:hidden">
+              <button
+                onClick={() => {
+                  const easyWaySection = document.getElementById('easy-way-section');
+                  if (easyWaySection) {
+                    easyWaySection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="flex items-center text-red-600 font-semibold text-lg hover:text-red-700 transition-colors"
+              >
+                <span>Explore</span>
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </button>
+            </div>
+            
+            {/* Desktop - Button */}
+            <div className="hidden sm:block">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  const easyWaySection = document.getElementById('easy-way-section');
+                  if (easyWaySection) {
+                    easyWaySection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-red-700 transition-colors shadow-lg"
+              >
+                Explore
+              </motion.button>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Booking Form Overlay */}
+        {!isOperatorOrAdmin && (
+          <div className="absolute right-8 xl:right-28 top-[55%] transform -translate-y-1/2 z-20 hidden lg:block">
+            <BookingForm onOpenAuthModal={() => setShowAuthModal(true)} />
+          </div>
+        )}
+        
+        {/* Mobile Booking Form */}
+        {!isOperatorOrAdmin && (
+          <div className="absolute bottom-32 left-3 right-3 z-30 lg:hidden">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-white text-center lg:text-left"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="flex justify-center relative z-30"
             >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                JETUP Private Flight Network
-              </h1>
-              <p className="text-xl md:text-2xl mb-8 opacity-90 leading-relaxed">
-                More Than Flight Experience
+              <BookingForm onOpenAuthModal={() => setShowAuthModal(true)} />
+            </motion.div>
+          </div>
+        )}
+      </section>
+
+      {/* New Section with Image and Content */}
+      <section id="easy-way-section" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left - Image */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              <img
+                src="/JETUP-Photo-01.jpg"
+                alt="Luxury Private Jet"
+                className="w-full h-64 md:h-96 object-cover rounded-2xl shadow-2xl"
+              />
+            </motion.div>
+            
+            {/* Right - Content */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="space-y-6 text-center lg:text-left"
+            >
+              <h2 className="text-4xl font-bold text-gray-900">
+                The Easy Way to Private Flight
+              </h2>
+              <p className="text-xl text-gray-600 leading-relaxed">
+                JETUP global private flight network offers customers and flight operators a seamless booking platform. JETUP provides premium customer portfolio, over 1,000 verified aircraft, and hundreds of approved flight operators for an unparalleled flight experience.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex justify-center lg:justify-start">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowAuthModal(true)}
-                  className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-red-700 transition-colors shadow-lg"
-                >
-                  GET STARTED
-                </motion.button>
-                <Link
-                  to="/experience"
-                  className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-gray-900 transition-colors"
-                >
-                  Learn More
-                </Link>
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                disabled={isOperatorOrAdmin || (user?.role === 'customer' && user?.profileCompletionStatus !== 'approved')}
+                onClick={() => {
+                  if (isOperatorOrAdmin || (user?.role === 'customer' && user?.profileCompletionStatus !== 'approved')) return;
+                  const aircraftSection = document.getElementById('available-aircraft');
+                  if (aircraftSection) {
+                    aircraftSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className={`px-8 py-4 rounded-lg font-semibold text-lg transition-colors shadow-lg ${
+                  isOperatorOrAdmin || (user?.role === 'customer' && user?.profileCompletionStatus !== 'approved')
+                    ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                    : 'bg-red-600 text-white hover:bg-red-700'
+                }`}
+              >
+                {isOperatorOrAdmin ? (
+                  <div className="flex items-center">
+                    <Lock className="h-5 w-5 mr-2" />
+                    <span>Access Restricted</span>
+                  </div>
+                ) : (user?.role === 'customer' && user?.profileCompletionStatus !== 'approved') ? (
+                  <div className="flex items-center">
+                    <Lock className="h-5 w-5 mr-2" />
+                    <span>Profile Approval Required</span>
+                  </div>
+                ) : (
+                  'Find aircrafts'
+                )}
+              </motion.button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Discover JETUP's Benefits Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Discover JETUP Benefits
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Get exclusive booking opportunities on JETUP's official private flight network.
+            </p>
+          </motion.div>
+
+          {/* For Customers and For Operators - Side by Side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-center md:text-left">
+            {/* For Customers */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="bg-white rounded-2xl shadow-lg p-8 space-y-6 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer text-center md:text-left"
+            >
+              {/* Image */}
+              <div className="relative -m-8 mb-2">
+                <img
+                  src="/JETUP-Photo-04.jpeg"
+                  alt="For Customers"
+                  className="w-full h-40 object-cover rounded-t-2xl"
+                />
+              </div>
+              
+              {/* Content */}
+              <div className="space-y-6">
+                <h3 className="text-3xl font-bold text-gray-900 text-center md:text-left">For Customers</h3>
+                <p className="text-gray-700 leading-relaxed text-center md:text-left">
+                  JETUP Private Flight booking platform provides customers with special discounted and privileged booking opportunities through JETUP's global verified aircraft fleet network and approved flight operator partners.
+                </p>
+                <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  window.location.href = '/membership';
+                }}
+                className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-red-700 transition-colors shadow-lg w-full"
+              >
+                Learn More
+              </motion.button>
               </div>
             </motion.div>
 
-            {/* Right - Booking Form */}
-            <div className="flex justify-center lg:justify-end">
-              <BookingForm onOpenAuthModal={() => setShowAuthModal(true)} />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              JETUP Global Fleet Network
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Connect with the world's most comprehensive private aviation network
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="text-center p-6"
-              >
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{backgroundColor: '#0B1733'}}>
-                  <feature.icon className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              JETUP Experience
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Discover the benefits that make JETUP the preferred choice for discerning travelers
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {benefits.map((benefit, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow"
-              >
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{backgroundColor: '#0B1733'}}>
-                  <benefit.icon className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">{benefit.title}</h3>
-                <p className="text-gray-600">{benefit.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-900 to-blue-800">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-white"
-          >
-            <h2 className="text-4xl font-bold mb-6">
-              Stay Updated with JETUP
-            </h2>
-            <p className="text-xl mb-8 opacity-90">
-              Get the latest news, exclusive offers, and aviation insights delivered to your inbox
-            </p>
-            
-            {subscriptionSuccess ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-green-500 text-white p-6 rounded-lg"
-              >
-                <CheckCircle className="h-8 w-8 mx-auto mb-2" />
-                <p className="text-lg font-medium">Successfully subscribed!</p>
-                <p className="text-sm opacity-90">Thank you for joining our newsletter.</p>
-              </motion.div>
-            ) : (
-              <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                <input
-                  type="email"
-                  value={newsletterEmail}
-                  onChange={(e) => setNewsletterEmail(e.target.value)}
-                  placeholder="Enter your email address"
-                  required
-                  className="flex-1 px-6 py-4 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white"
+            {/* Experience */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="bg-white rounded-2xl shadow-lg p-8 space-y-6 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer"
+            >
+              {/* Image */}
+              <div className="relative -m-8 mb-2">
+                <img
+                  src="/JETUP-Photo-06.jpg"
+                  alt="Experience"
+                  className="w-full h-40 object-cover rounded-t-2xl"
                 />
+              </div>
+              
+              {/* Content */}
+              <div className="space-y-6">
+                <h3 className="text-3xl font-bold text-gray-900 text-center md:text-left">For Experience</h3>
+                <p className="text-gray-700 leading-relaxed text-center md:text-left">
+                  JETUP continues to offer a unique flight experience to registered users and verified flight operators. JETUP makes private flight experience advantageous for users, whether for personal or business flights.
+                </p>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  type="submit"
-                  disabled={isSubscribing}
-                  className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:opacity-50"
+                  onClick={() => {
+                    window.location.href = '/experience';
+                  }}
+                  className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-red-700 transition-colors shadow-lg w-full"
                 >
-                  {isSubscribing ? 'Subscribing...' : 'Subscribe'}
+                  Learn More
                 </motion.button>
+              </div>
+            </motion.div>
+            {/* For Operators */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="bg-white rounded-2xl shadow-lg p-8 space-y-6 hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer"
+            >
+              {/* Image */}
+              <div className="relative -m-8 mb-2">
+                <img
+                  src="/JETUP-Photo-05.jpeg"
+                  alt="For Operators"
+                  className="w-full h-40 object-cover rounded-t-2xl"
+                />
+              </div>
+              
+              {/* Content */}
+              <div className="space-y-6">
+                <h3 className="text-3xl font-bold text-gray-900 text-center md:text-left">For Operators</h3>
+                <p className="text-gray-700 leading-relaxed text-center md:text-left">
+                  JETUP Private flight network portal provides partner flight operators with technologically advanced and user-friendly booking infrastructure. JETUP helps operators market their services and reach qualified customers as the connecting point for users and flight operators.
+                </p>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    window.location.href = '/operators';
+                  }}
+                  className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-red-700 transition-colors shadow-lg w-full"
+                >
+                  Learn More
+                </motion.button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Available Aircraft Section */}
+      <section id="available-aircraft" className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              JETUP Global Aircraft Offers
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Choose from JETUP's premium fleet of verified aircraft operated by certified professionals
+            </p>
+            <Link
+              to="/aircrafts"
+              className="inline-block mt-4 text-red-600 hover:text-red-700 font-medium underline transition-colors"
+            >
+              See More
+            </Link>
+          </motion.div>
+
+          {/* Filters */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-8"
+          >
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <div className="flex items-center mb-6">
+                <Filter className="h-5 w-5 text-blue-600 mr-2" />
+                <h3 className="text-lg font-semibold text-gray-900">Filter Aircraft</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Search */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Search Aircraft
+                  </label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <input
+                      type="text"
+                      placeholder="Search by name or operator..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Country Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Country
+                  </label>
+                  <select
+                    value={selectedCountry}
+                    onChange={(e) => setSelectedCountry(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                  >
+                    <option value="">All Countries</option>
+                    {countries.map((country) => (
+                      <option key={country} value={country}>
+                        {country}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Category Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Aircraft Category
+                  </label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                  >
+                    <option value="">All Categories</option>
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Clear Filters Button */}
+              {(searchTerm || selectedCountry || selectedCategory) && (
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={() => {
+                      setSearchTerm('');
+                      setSelectedCountry('');
+                      setSelectedCategory('');
+                    }}
+                    className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                  >
+                    Clear All Filters
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredAircraft.map((aircraft, index) => (
+              <motion.div
+                key={aircraft.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 + 0.2 }}
+              >
+                <AircraftCard 
+                  aircraft={aircraft} 
+                  showOperator={true}
+                  isAuthenticated={isAuthenticated}
+                  onRequestQuote={handleRequestQuote}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* No Results Message */}
+          {filteredAircraft.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center py-12"
+            >
+              <Plane className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Aircraft Found</h3>
+              <p className="text-gray-600 mb-6">
+                Try adjusting your filters to see more results
+              </p>
+              <button
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedCountry('');
+                  setSelectedCategory('');
+                }}
+                className="bg-blue-900 text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition-colors"
+              >
+                Clear Filters
+              </button>
+            </motion.div>
+          )}
+        </div>
+      </section>
+
+      {/* Popular Routes Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              JETUP Popular Routes
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              JETUP pre-planned flights on the most popular destinations with competitive pricing
+            </p>
+            <Link
+              to="/routes"
+              className="inline-block mt-4 text-red-600 hover:text-red-700 font-medium underline transition-colors"
+            >
+              See More
+            </Link>
+          </motion.div>
+
+          {/* Route Filters */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-8"
+          >
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <div className="flex items-center mb-6">
+                <Filter className="h-5 w-5 text-blue-600 mr-2" />
+                <h3 className="text-lg font-semibold text-gray-900">Filter Routes</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Search */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Search Routes
+                  </label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <input
+                      type="text"
+                      placeholder="Search by city or aircraft..."
+                      value={routeSearchTerm}
+                      onChange={(e) => setRouteSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Departure City Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Departure City
+                  </label>
+                  <select
+                    value={selectedDepartureCity}
+                    onChange={(e) => setSelectedDepartureCity(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                  >
+                    <option value="">All Cities</option>
+                    {departureCities.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Price Range Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Price Range
+                  </label>
+                  <select
+                    value={selectedPriceRange}
+                    onChange={(e) => setSelectedPriceRange(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                  >
+                    <option value="">All Prices</option>
+                    {priceRanges.map((range) => (
+                      <option key={range} value={range}>
+                        {range}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Clear Filters Button */}
+              {(routeSearchTerm || selectedDepartureCity || selectedPriceRange) && (
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={() => {
+                      setRouteSearchTerm('');
+                      setSelectedDepartureCity('');
+                      setSelectedPriceRange('');
+                    }}
+                    className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                  >
+                    Clear All Filters
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredRoutes.map((route, index) => (
+              <motion.div
+                key={route.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <RouteCard route={route} onOpenAuthModal={() => setShowAuthModal(true)} />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* No Results Message */}
+          {filteredRoutes.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center py-12"
+            >
+              <Plane className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Routes Found</h3>
+              <p className="text-gray-600 mb-6">
+                Try adjusting your filters to see more results
+              </p>
+              <button
+                onClick={() => {
+                  setRouteSearchTerm('');
+                  setSelectedDepartureCity('');
+                  setSelectedPriceRange('');
+                }}
+                className="bg-blue-900 text-white px-6 py-3 rounded-lg hover:bg-blue-800 transition-colors"
+              >
+                Clear Filters
+              </button>
+            </motion.div>
+          )}
+        </div>
+      </section>
+
+      {/* Help Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Do you need help?
+            </h2>
+            <p className="text-xl text-gray-600">
+              Our aviation experts are available 24/7 for your request.
+            </p>
+          </motion.div>
+
+          {/* Contact Options */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+            {/* Phone Support */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow"
+            >
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{backgroundColor: '#0B1733'}}>
+                <Phone className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Phone Support</h3>
+              <p className="text-gray-600 mb-6">
+                Speak directly with our aviation experts for immediate assistance
+              </p>
+              <a
+                href="tel:+18885656090"
+                className="inline-flex items-center justify-center w-full bg-red-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-red-700 transition-colors"
+              >
+                Call Center
+              </a>
+              <div className="flex items-center justify-center mt-4 text-sm text-gray-500">
+                <Clock className="h-4 w-4 mr-2" />
+                24/7 Available
+              </div>
+            </motion.div>
+
+            {/* Email Support */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow"
+            >
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{backgroundColor: '#0B1733'}}>
+                <Mail className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Email Support</h3>
+              <p className="text-gray-600 mb-6">
+                Send us detailed questions and we'll respond within 2 hours
+              </p>
+              <a
+                href="mailto:support@jetup.aero?subject=JETUP SUPPORT"
+                className="inline-flex items-center justify-center w-full bg-red-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-red-700 transition-colors"
+              >
+                Email Us
+              </a>
+              <div className="flex items-center justify-center mt-4 text-sm text-gray-500">
+                <Clock className="h-4 w-4 mr-2" />
+                Response within 2 hours
+              </div>
+            </motion.div>
+
+            {/* Live Chat */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow"
+            >
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{backgroundColor: '#0B1733'}}>
+                <MessageCircle className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Live Chat</h3>
+              <p className="text-gray-600 mb-6">
+                Chat with our support team for quick answers to your questions
+              </p>
+              <a
+                href="https://wa.me/18885656090"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center w-full bg-red-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-red-700 transition-colors"
+              >
+                WhatsApp
+              </a>
+              <div className="flex items-center justify-center mt-4 text-sm text-gray-500">
+                <Clock className="h-4 w-4 mr-2" />
+                24/7 Available
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Email Subscription Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Stay Updated
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Subscribe to our newsletter for exclusive offers, flight deals, and aviation news
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="max-w-4xl mx-auto"
+          >
+            <div className="bg-white rounded-2xl shadow-lg p-8">
+              <form className="space-y-6 lg:space-y-0">
+                <div className="flex flex-col lg:flex-row lg:items-end lg:space-x-4 space-y-6 lg:space-y-0">
+                  <div className="flex-1">
+                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      id="fullName"
+                      name="fullName"
+                      required
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  
+                  <div className="flex-1">
+                    <label htmlFor="emailAddress" className="block text-sm font-medium text-gray-700 mb-2">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      id="emailAddress"
+                      name="emailAddress"
+                      required
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="Enter your email address"
+                    />
+                  </div>
+
+                  <div className="flex-shrink-0">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      className="w-full lg:w-auto bg-red-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-red-700 transition-colors shadow-lg whitespace-nowrap"
+                    >
+                      Subscribe to Newsletter
+                    </motion.button>
+                  </div>
+                </div>
               </form>
-            )}
+              
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-600">
+                  By subscribing, you agree to receive marketing emails. You can{' '}
+                  <button className="text-blue-600 hover:text-blue-800 underline">
+                    unsubscribe at any time
+                  </button>
+                  .
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Disclaimer Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center"
+          >
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Legal Statement
+            </h2>
+            <div className="max-w-6xl mx-auto">
+              <p className="text-gray-500 leading-relaxed text-base">
+                JETUP Private is a booking system portal for its flight network, connecting premium customers with a globally approved fleet of aircraft and verified flight operators. JETUP is not a direct charter flight operator. It is not directly affiliated with an aircraft fleet and does not directly sell or market charter flights on its own behalf. JETUP operates a booking portal through a membership system for users and flight operators. For more disclaimers and legal status, please visit the{' '}
+                <a href="/disclaimer" className="text-blue-500 hover:text-blue-700 underline">
+                  disclaimers
+                </a>
+                {' '}and{' '}
+                <a href="/legal" className="text-blue-500 hover:text-blue-700 underline">
+                  legal status
+                </a>
+                , please visit the respective pages
+                .
+              </p>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -353,17 +1079,17 @@ const HomePage: React.FC = () => {
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8">
             <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center lg:justify-start space-x-3">
                 <Link
                   to="/operators"
-                  className="px-4 py-2 border-2 border-white text-white rounded-lg hover:bg-red-600 hover:border-red-600 transition-colors w-40 text-center text-sm"
+                  className="px-4 py-2 border-2 border-white text-white rounded-lg hover:bg-red-600 hover:border-red-600 hover:text-white transition-colors w-40 text-center text-sm"
                   style={{backgroundColor: '#0B1733'}}
                 >
                   FOR OPERATORS
                 </Link>
                 <Link
                   to="/fleet"
-                  className="px-4 py-2 border-2 border-white text-white rounded-lg hover:bg-red-600 hover:border-red-600 transition-colors w-40 text-center text-sm"
+                  className="px-4 py-2 border-2 border-white text-white rounded-lg hover:bg-red-600 hover:border-red-600 hover:text-white transition-colors w-40 text-center text-sm"
                   style={{backgroundColor: '#0B1733'}}
                 >
                   FLEET GUIDE
