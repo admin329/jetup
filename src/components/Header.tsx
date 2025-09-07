@@ -67,6 +67,11 @@ const Header: React.FC<HeaderProps> = ({ showAuthModal = false, setShowAuthModal
     return 'text-white';
   };
 
+  // Determine hover color
+  const getHoverColor = () => {
+    return 'hover:text-red-500';
+  };
+
   const navigation = [
     { name: 'Experience', href: '/experience' },
     { name: 'Membership', href: '/membership' },
@@ -79,7 +84,12 @@ const Header: React.FC<HeaderProps> = ({ showAuthModal = false, setShowAuthModal
     <>
       <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${getHeaderBackground()} ${
         isHomePage && !isScrolled ? '' : 'shadow-lg'
-      }`}>
+      }`}
+        style={{
+          backgroundColor: getHeaderBackground(),
+          boxShadow: (isHomePage && !isScrolled) ? 'none' : '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+        }}
+      >
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-24">
             {/* Logo */}
