@@ -2,78 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-/* NUCLEAR OPTION - STRIPE TAMAMEN DEVRE DIŞI */
-/* Tüm Stripe iframe'leri tamamen yok et */
-iframe,
-object,
-embed {
+/* STRONG Stripe iframe hiding */
+iframe[name*="__privateStripe"],
+iframe[name*="__privateStripeController"],
+iframe[name*="__privateStripeMetricsController"] {
   display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
   position: absolute !important;
-  top: -99999px !important;
-  left: -99999px !important;
+  top: -10000px !important;
+  left: -10000px !important;
   width: 0 !important;
   height: 0 !important;
-  z-index: -99999 !important;
+  z-index: -9999 !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
   pointer-events: none !important;
   overflow: hidden !important;
 }
 
-/* Ana içeriği zorla görünür yap */
+/* Main content always visible */
 #root {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
   position: relative !important;
-  z-index: 99999 !important;
-  background: white !important;
-  min-height: 100vh !important;
-  width: 100% !important;
+  z-index: 1000 !important;
+  background: white;
 }
 
-/* Body ve HTML kontrolü */
-html, body {
-  overflow-x: hidden !important;
+/* Body overflow control */
+body {
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Hide all Stripe iframes */
+iframe[src*="stripe.com"],
+iframe[src*="js.stripe.com"] {
+  display: none !important;
+  position: absolute !important;
+  top: -10000px !important;
+  left: -10000px !important;
+  width: 0 !important;
+  height: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Allow only important iframes */
+iframe[src*="youtube.com"],
+iframe[src*="vimeo.com"],
+iframe[src*="maps.google.com"] {
+  display: block !important;
   position: relative !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background: white !important;
-}
-
-/* Tüm div'leri görünür yap */
-div {
-  position: relative !important;
-}
-
-/* Header'ı zorla görünür yap */
-header {
-  display: block !important;
   visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 9999 !important;
-}
-
-/* Main content'i zorla görünür yap */
-main {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 9999 !important;
-}
-
-/* Section'ları zorla görünür yap */
-section {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 9999 !important;
-}
-
-/* Footer'ı zorla görünür yap */
-footer {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 9999 !important;
 }
