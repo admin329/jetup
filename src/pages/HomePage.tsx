@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plane, Star, Shield, Clock, Crown, Users, MapPin, Award, MessageCircle, ArrowRight, Filter, Phone, Search, Mail, CheckCircle, Globe, Building, DollarSign, Calendar, Eye, Download, FileText } from 'lucide-react';
+import { Plane, Star, Shield, Clock, Crown, Users, MapPin, Award, MessageCircle, ArrowRight, Filter, Phone, Search, Mail, CheckCircle, Globe, Building, DollarSign, Calendar, Eye, Download, FileText, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import SEOHead from '../components/SEOHead';
 import StructuredData from '../components/StructuredData';
@@ -9,6 +9,7 @@ import Header from '../components/Header';
 import BookingForm from '../components/BookingForm';
 import AircraftCard from '../components/AircraftCard';
 import RouteCard from '../components/RouteCard';
+import CustomDropdown from '../components/CustomDropdown';
 
 const HomePage: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -205,7 +206,7 @@ const HomePage: React.FC = () => {
             <p className="text-lg sm:text-xl md:text-2xl mb-6 lg:mb-8 font-light -mt-4 sm:-mt-0">
               More Than Flight Experience
             </p>
-            {/* Mobile - Text with Arrow */}
+            <div className="mt-6 md:mt-12">
             <div className="block sm:hidden">
               <button
                 onClick={() => {
@@ -236,6 +237,7 @@ const HomePage: React.FC = () => {
               >
                 Explore
               </motion.button>
+            </div>
             </div>
           </motion.div>
         </div>
@@ -524,18 +526,12 @@ const HomePage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Country
                   </label>
-                  <select
+                  <CustomDropdown
                     value={selectedCountry}
-                    onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
-                  >
-                    <option value="">All Countries</option>
-                    {countries.map((country) => (
-                      <option key={country} value={country}>
-                        {country}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedCountry}
+                    placeholder="All Countries"
+                    options={['', ...countries]}
+                  />
                 </div>
 
                 {/* Category Filter */}
@@ -543,18 +539,12 @@ const HomePage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Aircraft Category
                   </label>
-                  <select
+                  <CustomDropdown
                     value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
-                  >
-                    <option value="">All Categories</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedCategory}
+                    placeholder="All Categories"
+                    options={['', ...categories]}
+                  />
                 </div>
               </div>
 
@@ -684,18 +674,12 @@ const HomePage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Departure City
                   </label>
-                  <select
+                  <CustomDropdown
                     value={selectedDepartureCity}
-                    onChange={(e) => setSelectedDepartureCity(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
-                  >
-                    <option value="">All Cities</option>
-                    {departureCities.map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedDepartureCity}
+                    placeholder="All Cities"
+                    options={['', ...departureCities]}
+                  />
                 </div>
 
                 {/* Price Range Filter */}
@@ -703,18 +687,12 @@ const HomePage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Price Range
                   </label>
-                  <select
+                  <CustomDropdown
                     value={selectedPriceRange}
-                    onChange={(e) => setSelectedPriceRange(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
-                  >
-                    <option value="">All Prices</option>
-                    {priceRanges.map((range) => (
-                      <option key={range} value={range}>
-                        {range}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedPriceRange}
+                    placeholder="All Prices"
+                    options={['', ...priceRanges]}
+                  />
                 </div>
               </div>
 
@@ -797,7 +775,7 @@ const HomePage: React.FC = () => {
           </motion.div>
 
           {/* Contact Options */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
             {/* Phone Support */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -817,12 +795,8 @@ const HomePage: React.FC = () => {
                 href="tel:+18885656090"
                 className="inline-flex items-center justify-center w-full bg-red-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-red-700 transition-colors"
               >
-                Call Center
+                Call +1 888 565 6090
               </a>
-              <div className="flex items-center justify-center mt-4 text-sm text-gray-500">
-                <Clock className="h-4 w-4 mr-2" />
-                24/7 Available
-              </div>
             </motion.div>
 
             {/* Email Support */}
@@ -838,18 +812,14 @@ const HomePage: React.FC = () => {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Email Support</h3>
               <p className="text-gray-600 mb-6">
-                Send us detailed questions and we'll respond within 2 hours
+                Send detailed questions and receive expert responses within 2 hours
               </p>
               <a
-                href="mailto:support@jetup.aero?subject=JETUP SUPPORT"
+                href="mailto:support@jetup.aero"
                 className="inline-flex items-center justify-center w-full bg-red-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-red-700 transition-colors"
               >
-                Email Us
+                Email Support
               </a>
-              <div className="flex items-center justify-center mt-4 text-sm text-gray-500">
-                <Clock className="h-4 w-4 mr-2" />
-                Response within 2 hours
-              </div>
             </motion.div>
 
             {/* Live Chat */}
@@ -865,7 +835,7 @@ const HomePage: React.FC = () => {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Live Chat</h3>
               <p className="text-gray-600 mb-6">
-                Chat with our support team for quick answers to your questions
+                Connect instantly with our support team for quick assistance
               </p>
               <a
                 href="https://wa.me/18885656090"
@@ -873,102 +843,15 @@ const HomePage: React.FC = () => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center w-full bg-red-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-red-700 transition-colors"
               >
-                WhatsApp
+                WhatsApp Chat
               </a>
-              <div className="flex items-center justify-center mt-4 text-sm text-gray-500">
-                <Clock className="h-4 w-4 mr-2" />
-                24/7 Available
-              </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Email Subscription Section */}
+      {/* Stay Updated Section */}
       <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Stay Updated
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Subscribe to our newsletter for exclusive offers, flight deals, and aviation news
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="max-w-4xl mx-auto"
-          >
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <form className="space-y-6 lg:space-y-0">
-                <div className="flex flex-col lg:flex-row lg:items-end lg:space-x-4 space-y-6 lg:space-y-0">
-                  <div className="flex-1">
-                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      id="fullName"
-                      name="fullName"
-                      required
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-                  
-                  <div className="flex-1">
-                    <label htmlFor="emailAddress" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      id="emailAddress"
-                      name="emailAddress"
-                      required
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="Enter your email address"
-                    />
-                  </div>
-
-                  <div className="flex-shrink-0">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      type="submit"
-                      className="w-full lg:w-auto bg-red-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-red-700 transition-colors shadow-lg whitespace-nowrap"
-                    >
-                      Subscribe to Newsletter
-                    </motion.button>
-                  </div>
-                </div>
-              </form>
-              
-              <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600">
-                  By subscribing, you agree to receive marketing emails. You can{' '}
-                  <button className="text-blue-600 hover:text-blue-800 underline">
-                    unsubscribe at any time
-                  </button>
-                  .
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Disclaimer Section */}
-      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -978,25 +861,55 @@ const HomePage: React.FC = () => {
             className="text-center"
           >
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Legal Statement
+              Stay Updated
             </h2>
-            <div className="max-w-6xl mx-auto">
-              <p className="text-gray-500 leading-relaxed text-base">
-                JETUP Private is a booking system portal for its flight network, connecting premium customers with a globally approved fleet of aircraft and verified flight operators. JETUP is not a direct charter flight operator. It is not directly affiliated with an aircraft fleet and does not directly sell or market charter flights on its own behalf. JETUP operates a booking portal through a membership system for users and flight operators. For more disclaimers and legal status, please visit the{' '}
-                <a href="/disclaimer" className="text-blue-500 hover:text-blue-700 underline">
-                  disclaimers
-                </a>
-                {' '}and{' '}
-                <a href="/legal" className="text-blue-500 hover:text-blue-700 underline">
-                  legal status
-                </a>
-                , please visit the respective pages
-                .
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              Subscribe to our newsletter for exclusive offers, flight deals, and aviation news
+            </p>
+            
+            <div className="max-w-2xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter your full name"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="Enter your email address"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-red-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors shadow-lg"
+              >
+                Subscribe to Newsletter
+              </motion.button>
+              
+              <p className="text-sm text-gray-500 mt-4">
+                By subscribing, you agree to receive marketing emails. You can{' '}
+                <a href="/unsubscribe" className="text-blue-600 hover:text-blue-800 underline">
+                  unsubscribe at any time
+                </a>.
               </p>
             </div>
           </motion.div>
         </div>
       </section>
+
 
       {/* Footer */}
       <footer className="text-white py-12" style={{backgroundColor: '#0B1733'}}>
@@ -1079,17 +992,17 @@ const HomePage: React.FC = () => {
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8">
             <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
-              <div className="flex items-center justify-center lg:justify-start space-x-3">
+              <div className="flex items-center space-x-3">
                 <Link
                   to="/operators"
-                  className="px-4 py-2 border-2 border-white text-white rounded-lg hover:bg-red-600 hover:border-red-600 hover:text-white transition-colors w-40 text-center text-sm"
+                  className="px-4 py-2 border-2 border-white text-white rounded-lg hover:bg-red-600 hover:border-red-600 transition-colors w-40 text-center text-sm"
                   style={{backgroundColor: '#0B1733'}}
                 >
                   FOR OPERATORS
                 </Link>
                 <Link
                   to="/fleet"
-                  className="px-4 py-2 border-2 border-white text-white rounded-lg hover:bg-red-600 hover:border-red-600 hover:text-white transition-colors w-40 text-center text-sm"
+                  className="px-4 py-2 border-2 border-white text-white rounded-lg hover:bg-red-600 hover:border-red-600 transition-colors w-40 text-center text-sm"
                   style={{backgroundColor: '#0B1733'}}
                 >
                   FLEET GUIDE
