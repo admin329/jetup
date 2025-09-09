@@ -43,7 +43,7 @@ const SENDGRID_TEMPLATES = {
 };
 
 // SendGrid API Configuration
-const SENDGRID_API_KEY = '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';
+const SENDGRID_API_KEY = import.meta.env.SENDGRID_API_KEY || '';
 const SENDGRID_FROM_EMAIL = 'noreply@jetup.aero';
 
 export interface LoginVerificationParams {
