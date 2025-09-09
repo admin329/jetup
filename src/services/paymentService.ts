@@ -1,10 +1,19 @@
-import { loadStripe } from '@stripe/stripe-js';
+import { config } from '../config/environment';
 
 // Stripe configuration - Live keys
-const STRIPE_PUBLISHABLE_KEY = 'pk_live_51Rxm5xRoRmnrtidggbBqABsqH839S7iN1UoodLKBs3yi6Y25CHJLSE9AT6H5XpyahRV5I56IoQt0i8rAsRBXezVu00ixCbtnzc';
+const STRIPE_PUBLISHABLE_KEY = config.stripe.publishableKey;
 const STRIPE_SECRET_KEY = 'sk_live_51•••••fwW'; // Secret key for server-side operations (backend only)
-const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
+// Lazy load Stripe only when needed
+let stripePromise: Promise<any> | null = null;
+
+const getStripe = async () => {
+  if (!stripePromise) {
+    const { loadStripe } = await import('@stripe/stripe-js');
+    stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
+  }
+  return stripePromise;
+};
 export interface PaymentData {
   amount: number;
   currency: string;
@@ -346,7 +355,7 @@ export const processBookingPayment = async (
 
 // Initialize Stripe Elements (for future use)
 export const initializeStripeElements = async () => {
-  const stripe = await stripePromise;
+  const stripe = await getStripe();
   if (!stripe) {
     throw new Error('Stripe failed to initialize');
   }
