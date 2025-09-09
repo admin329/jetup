@@ -5,6 +5,7 @@ import { ArrowRight, Clock, Star, Building2, MapPin, Search, Filter, Plane, Mess
 import SEOHead from '../components/SEOHead';
 import Header from '../components/Header';
 import RouteCard from '../components/RouteCard';
+import CustomDropdown from '../components/CustomDropdown';
 
 const RoutesPage: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = React.useState(false);
@@ -189,18 +190,12 @@ const RoutesPage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Departure City
                   </label>
-                  <select
+                  <CustomDropdown
                     value={selectedDepartureCity}
-                    onChange={(e) => setSelectedDepartureCity(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
-                  >
-                    <option value="">All Cities</option>
-                    {departureCities.map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedDepartureCity}
+                    placeholder="All Cities"
+                    options={['', ...departureCities]}
+                  />
                 </div>
 
                 {/* Price Range Filter */}
@@ -208,18 +203,12 @@ const RoutesPage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Price Range
                   </label>
-                  <select
+                  <CustomDropdown
                     value={selectedPriceRange}
-                    onChange={(e) => setSelectedPriceRange(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
-                  >
-                    <option value="">All Prices</option>
-                    {priceRanges.map((range) => (
-                      <option key={range} value={range}>
-                        {range}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedPriceRange}
+                    placeholder="All Prices"
+                    options={['', ...priceRanges]}
+                  />
                 </div>
               </div>
 
