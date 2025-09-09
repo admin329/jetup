@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Phone, Mail, MessageCircle, Clock, ChevronDown, ChevronUp, Filter, Search } from 'lucide-react';
 import SEOHead from '../components/SEOHead';
 import Header from '../components/Header';
+import CustomDropdown from '../components/CustomDropdown';
 
 const SupportPage: React.FC = () => {
   const [openFAQ, setOpenFAQ] = React.useState<number | null>(null);
@@ -456,18 +457,12 @@ const SupportPage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Category
                   </label>
-                  <select
+                  <CustomDropdown
                     value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
-                  >
-                    <option value="">All Categories</option>
-                    {faqCategories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedCategory}
+                    placeholder="All Categories"
+                    options={['', ...faqCategories]}
+                  />
                 </div>
               </div>
 
