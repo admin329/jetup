@@ -56,8 +56,12 @@ const RouteCard: React.FC<RouteCardProps> = ({ route, onOpenAuthModal }) => {
   const [bookingData, setBookingData] = useState({
     date: '',
     time: '',
-    passengers: 1,
+    passengers: 0,
     message: ''
+  });
+
+  const [formData, setFormData] = useState({
+    passengers: 1
   });
 
   // Update timezone info when route changes
@@ -189,6 +193,12 @@ const RouteCard: React.FC<RouteCardProps> = ({ route, onOpenAuthModal }) => {
     
     if (!bookingData.date || !bookingData.time) {
       alert('Please select both date and time for your flight');
+      return;
+    }
+    
+    // Validate passengers
+    if (formData.passengers === 0) {
+      alert('Please select number of passengers');
       return;
     }
     
@@ -495,13 +505,17 @@ const RouteCard: React.FC<RouteCardProps> = ({ route, onOpenAuthModal }) => {
   };
 
   const handlePassengerChange = (increment: boolean) => {
-    const newPassengers = increment ? bookingData.passengers + 1 : bookingData.passengers - 1;
-    if (newPassengers >= 1 && newPassengers <= 200) {
-      setBookingData({
-        ...bookingData,
-        passengers: newPassengers
-      });
-    }
+    const currentPassengers = formData.passengers;
+    let newPassengers = increment ? currentPassengers + 1 : currentPassengers - 1;
+    
+    // Min 0, Max 200 sınırı
+    if (newPassengers < 0) newPassengers = 0;
+    if (newPassengers > 200) newPassengers = 200;
+    
+    setFormData({
+      ...formData,
+      passengers: newPassengers
+    });
   };
 
   // Get button text and action based on booking status
@@ -760,12 +774,8 @@ const RouteCard: React.FC<RouteCardProps> = ({ route, onOpenAuthModal }) => {
 
               {/* Booking Form */}
               <form onSubmit={handleBookingSubmit} className="space-y-4">
-                {/* Date & Time - Full Width */}
+                {/* Date & Time - No Label */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Calendar className="h-4 w-4 inline mr-1" />
-                    Date & Time
-                  </label>
                   <DateTimePicker
                     value={bookingData.date && bookingData.time ? `${bookingData.date}T${bookingData.time}` : ''}
                     onChange={(datetime) => {
@@ -789,25 +799,35 @@ const RouteCard: React.FC<RouteCardProps> = ({ route, onOpenAuthModal }) => {
                     required
                     minDateTime={minimumDateTime}
                     timezoneInfo={timezoneInfo}
+                    fromLocation={route.from}
+                    toLocation={route.to}
                   />
+                  {/* Timezone Info */}
+                  {bookingData.date && bookingData.time && route.from && (
+                    <p className="text-xs text-blue-600 mt-2">
+                      📍 {(() => {
+                        const timezoneDisplay = getTimezoneDisplayName(route.from);
+                        const currentAirportTime = getCurrentTimeInAirportTimezone(route.from);
+                        return `${timezoneDisplay} - Current: ${currentAirportTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                      })()}
+                    </p>
+                  )}
                 </div>
 
-                {/* Passengers - Full Width */}
+                {/* Passengers - BookingPage Style */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Users className="h-4 w-4 inline mr-1" />
-                    Passengers
-                  </label>
                   <div className="relative">
                     <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                     <div className="w-full pl-10 pr-20 py-4 border border-gray-300 rounded-xl bg-gray-50 text-sm flex items-center">
-                      <span className="flex-1">{bookingData.passengers} {bookingData.passengers === 1 ? 'Passenger' : 'Passengers'}</span>
+                      <span className="flex-1 text-gray-500">
+                        {bookingData.passengers === 1 ? 'Passenger' : `${bookingData.passengers} Passengers`}
+                      </span>
                     </div>
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
                       <button
                         type="button"
                         onClick={() => handlePassengerChange(false)}
-                        disabled={bookingData.passengers <= 1}
+                        disabled={bookingData.passengers <= 0}
                         className="w-6 h-6 rounded-full bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed flex items-center justify-center text-gray-700 disabled:text-gray-400 text-xs font-bold"
                       >
                         -
@@ -822,20 +842,23 @@ const RouteCard: React.FC<RouteCardProps> = ({ route, onOpenAuthModal }) => {
                       </button>
                     </div>
                   </div>
+                  {bookingData.passengers > 0 && (
+                    <p className="text-xs text-blue-600 mt-2 flex items-center">
+                      <AlertTriangle className="h-3 w-3 mr-1 text-red-500" />
+                      Those aged 18 and under are counted as passengers.
+                    </p>
+                  )}
                 </div>
 
-                {/* Special Requests */}
+                {/* Special Requests - No Label */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Special Requests (Optional)
-                  </label>
                   <textarea
                     name="message"
                     value={bookingData.message}
                     onChange={handleInputChange}
                     rows={3}
-                    placeholder="Any special requirements or requests..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                    placeholder="Any special requirements, catering preferences, or additional services..."
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl resize-vertical focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
                   />
                 </div>
 
@@ -1069,7 +1092,7 @@ const RouteCard: React.FC<RouteCardProps> = ({ route, onOpenAuthModal }) => {
                       name="billingAddress.country"
                       value={paymentData.billingAddress.country}
                       onChange={handlePaymentInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       required
                     >
                       <option value="United States">United States</option>
@@ -1142,7 +1165,7 @@ const RouteCard: React.FC<RouteCardProps> = ({ route, onOpenAuthModal }) => {
                     <span className="text-red-700">Penalty ({cancellationInfo.penaltyPercentage}%):</span>
                     <span className="font-medium">-${cancellationInfo.penaltyAmount}</span>
                   </div>
-                  <div className="flex justify-between font-bold border-t border-red-300 pt-2">
+                  <div className="flex justify-between font-bold border-t pt-2">
                     <span className="text-red-800">Refund Amount:</span>
                     <span className="text-green-600">${cancellationInfo.refundAmount}</span>
                   </div>
