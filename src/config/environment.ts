@@ -20,7 +20,7 @@ export const config = {
 
   // Email Configuration
   email: {
-    sendgridApiKey: import.meta.env.SENDGRID_API_KEY || '',
+    sendgridApiKey: import.meta.env.SENDGRID_API_KEY || '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',
     fromEmail: 'noreply@jetup.aero',
     fromName: 'JETUP LTD (UK)',
     replyTo: 'support@jetup.aero',
