@@ -2,70 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
-/* AGGRESSIVE Stripe iframe hiding - Fix for jetup.aero */
-iframe[name*="__privateStripe"],
-iframe[name*="__privateStripeController"],
-iframe[name*="__privateStripeMetricsController"],
-iframe[src*="stripe.com"],
-iframe[src*="js.stripe.com"],
-iframe[title*="stripe"],
-iframe[id*="stripe"] {
+/* NUCLEAR OPTION - STRIPE TAMAMEN DEVRE DIŞI */
+/* Tüm Stripe iframe'leri tamamen yok et */
+iframe,
+object,
+embed {
   display: none !important;
-  position: absolute !important;
-  top: -10000px !important;
-  left: -10000px !important;
-  width: 0 !important;
-  height: 0 !important;
-  z-index: -9999 !important;
   visibility: hidden !important;
   opacity: 0 !important;
+  position: absolute !important;
+  top: -99999px !important;
+  left: -99999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  z-index: -99999 !important;
   pointer-events: none !important;
   overflow: hidden !important;
-  transform: translateX(-10000px) !important;
 }
 
-/* Force main content visibility */
+/* Ana içeriği zorla görünür yap */
 #root {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
   position: relative !important;
-  z-index: 1000 !important;
+  z-index: 99999 !important;
   background: white !important;
   min-height: 100vh !important;
   width: 100% !important;
 }
 
-/* Body and HTML control */
-html {
-  overflow-x: hidden !important;
-  position: relative !important;
-}
-
-body {
+/* Body ve HTML kontrolü */
+html, body {
   overflow-x: hidden !important;
   position: relative !important;
   margin: 0 !important;
   padding: 0 !important;
+  background: white !important;
 }
 
-/* Nuclear option - hide ALL suspicious iframes */
-iframe:not([src*="youtube.com"]):not([src*="vimeo.com"]):not([src*="maps.google.com"]) {
-  display: none !important;
-  position: absolute !important;
-  top: -10000px !important;
-  left: -10000px !important;
-  width: 0 !important;
-  height: 0 !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  z-index: -9999 !important;
-}
-
-/* Allow only specific trusted iframes */
-iframe[src*="youtube.com"],
-iframe[src*="vimeo.com"],
-iframe[src*="maps.google.com"] {
-  display: block !important;
+/* Tüm div'leri görünür yap */
+div {
   position: relative !important;
+}
+
+/* Header'ı zorla görünür yap */
+header {
+  display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
-  z-index: auto !important;
+  z-index: 9999 !important;
+}
+
+/* Main content'i zorla görünür yap */
+main {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 9999 !important;
+}
+
+/* Section'ları zorla görünür yap */
+section {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 9999 !important;
+}
+
+/* Footer'ı zorla görünür yap */
+footer {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 9999 !important;
 }
