@@ -2,36 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Fix Stripe iframe overlay issue */
-iframe[name*="__privateStripe"] {
-  position: fixed !important;
-  top: -9999px !important;
-  left: -9999px !important;
-  width: 1px !important;
-  height: 1px !important;
-  z-index: -1 !important;
+/* STRONG Stripe iframe hiding */
+iframe[name*="__privateStripe"],
+iframe[name*="__privateStripeController"],
+iframe[name*="__privateStripeMetricsController"] {
+  display: none !important;
+  position: absolute !important;
+  top: -10000px !important;
+  left: -10000px !important;
+  width: 0 !important;
+  height: 0 !important;
+  z-index: -9999 !important;
   visibility: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;
+  overflow: hidden !important;
 }
 
-/* Ensure main content is always visible */
+/* Main content always visible */
 #root {
-  position: relative;
-  z-index: 1;
+  position: relative !important;
+  z-index: 1000 !important;
+  background: white;
 }
 
-/* Fix any overlay issues */
+/* Body overflow control */
 body {
   overflow-x: hidden;
+  position: relative;
 }
 
-/* Prevent iframe interference */
-iframe:not([src*="youtube"]):not([src*="vimeo"]):not([src*="maps"]) {
-  max-width: 1px !important;
-  max-height: 1px !important;
+/* Hide all Stripe iframes */
+iframe[src*="stripe.com"],
+iframe[src*="js.stripe.com"] {
+  display: none !important;
   position: absolute !important;
-  top: -9999px !important;
-  left: -9999px !important;
+  top: -10000px !important;
+  left: -10000px !important;
+  width: 0 !important;
+  height: 0 !important;
   visibility: hidden !important;
+}
+
+/* Allow only important iframes */
+iframe[src*="youtube.com"],
+iframe[src*="vimeo.com"],
+iframe[src*="maps.google.com"] {
+  display: block !important;
+  position: relative !important;
+  visibility: visible !important;
 }
