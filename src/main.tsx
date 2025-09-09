@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import App from './App.tsx';
 import './index.css';
+import './test/paymentTest';
+import './test/emailTest';
+import './test/stripeTest';
 import { initializeEnvironment } from './config/environment';
 import { setupGlobalErrorHandler } from './utils/errorHandler';
 import { initializeSecurity } from './utils/security';
@@ -16,16 +19,6 @@ initializeEnvironment();
 setupGlobalErrorHandler();
 initializeSecurity();
 initializeTwoFactorService();
-
-// Force remove any Stripe elements on load
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    const stripeElements = document.querySelectorAll('iframe[src*="stripe"], iframe[name*="stripe"], iframe[title*="stripe"]');
-    stripeElements.forEach(el => {
-      el.remove();
-    });
-  }, 100);
-});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
