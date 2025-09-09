@@ -9,6 +9,8 @@ interface DateTimePickerProps {
   className?: string;
   minDateTime?: string; // Format: "YYYY-MM-DDTHH:MM"
   timezoneInfo?: string;
+  fromLocation?: string;
+  toLocation?: string;
 }
 
 const DateTimePicker: React.FC<DateTimePickerProps> = ({
@@ -18,21 +20,19 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   required = false,
   className = '',
   minDateTime,
-  timezoneInfo
+  timezoneInfo,
+  fromLocation,
+  toLocation
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(value.split('T')[0] || '');
-  const [selectedHour, setSelectedHour] = useState(value.split('T')[1]?.split(':')[0] || '');
-  const [selectedMinute, setSelectedMinute] = useState(value.split('T')[1]?.split(':')[1] || '');
-  const [currentMonth, setCurrentMonth] = useState(() => {
-    if (value.split('T')[0]) {
-      const [year, month] = value.split('T')[0].split('-');
-      return new Date(parseInt(year), parseInt(month) - 1, 1);
-    }
-    return new Date();
-  });
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedHour, setSelectedHour] = useState('');
+  const [selectedMinute, setSelectedMinute] = useState('');
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Check if From and To are selected
+  const isFromToSelected = fromLocation && toLocation && fromLocation.trim() !== '' && toLocation.trim() !== '';
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -55,12 +55,33 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         setSelectedHour(hour || '');
         setSelectedMinute(minute || '');
       }
+    } else {
+      setSelectedDate('');
+      setSelectedHour('');
+      setSelectedMinute('');
     }
   }, [value]);
 
   const handleDateTimeSelect = () => {
     if (selectedDate && selectedHour && selectedMinute) {
       const dateTimeString = `${selectedDate}T${selectedHour}:${selectedMinute}`;
+      
+      console.log('🕐 İSTANBUL DateTime Selection Debug:', {
+        selectedDate,
+        selectedHour,
+        selectedMinute,
+        dateTimeString,
+        minDateTime,
+        timezoneInfo,
+        isValidTime: !minDateTime || dateTimeString >= minDateTime
+      });
+      
+      // Minimum time kontrolü
+      if (minDateTime && dateTimeString < minDateTime) {
+        alert(`Minimum booking time: ${new Date(minDateTime).toLocaleString()} (İstanbul Time)`);
+        return;
+      }
+      
       onChange(dateTimeString);
       setIsOpen(false);
     }
@@ -68,31 +89,15 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
 
   const formatDisplayDateTime = () => {
     if (selectedDate && selectedHour && selectedMinute) {
-      // Use proper date formatting to match selection
-      const date = new Date(selectedDate + 'T12:00:00');
-      const formattedDate = date.toLocaleDateString('en-US');
-      return formattedDate + ' at ' + `${selectedHour}:${selectedMinute}`;
+      // Parse date correctly
+      const dateObj = new Date(selectedDate + 'T00:00:00');
+      const day = dateObj.getDate().toString().padStart(2, '0');
+      const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+      const year = dateObj.getFullYear();
+      
+      return `${day}/${month}/${year} at ${selectedHour}:${selectedMinute}`;
     }
     return '';
-  };
-
-  const isTimeDisabled = (hour: string, minute: string) => {
-    if (!minDateTime || !selectedDate) return false;
-    
-    const [minDate, minTime] = minDateTime.split('T');
-    if (selectedDate > minDate) return false;
-    if (selectedDate < minDate) return true;
-    
-    // Same date, check time
-    const [minHour, minMinute] = minTime.split(':');
-    const selectedTime = parseInt(hour) * 60 + parseInt(minute);
-    const minimumTime = parseInt(minHour) * 60 + parseInt(minMinute);
-    
-    return selectedTime < minimumTime;
-  };
-
-  const getMinDate = () => {
-    return minDateTime ? minDateTime.split('T')[0] : '';
   };
 
   // Generate calendar days
@@ -118,31 +123,45 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
 
   const calendarDays = generateCalendarDays();
 
+  // Get today's date in YYYY-MM-DD format
+  const getTodayString = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const todayString = getTodayString();
+
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <div className="relative">
         <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            if (!isFromToSelected) {
+              alert('Please select departure and destination airports first');
+              return;
+            }
+            setIsOpen(!isOpen);
+          }}
           className="w-full pl-10 pr-10 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-left text-sm"
         >
           <span className={formatDisplayDateTime() ? 'text-gray-900 text-sm' : 'text-gray-500 text-sm'}>
-            {formatDisplayDateTime() || placeholder}
+            {!isFromToSelected 
+              ? placeholder 
+              : formatDisplayDateTime() || placeholder
+            }
           </span>
         </button>
         <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 pointer-events-none" />
       </div>
 
-      {/* Timezone Info */}
-      {timezoneInfo && (
-        <p className="text-xs text-blue-600 mt-2">
-          📍 {timezoneInfo}
-        </p>
-      )}
 
       {/* DateTime Picker Dropdown */}
-      {isOpen && (
+      {isOpen && isFromToSelected && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-96">
           <div className="p-4">
             <div className="grid grid-cols-2 gap-4">
@@ -190,14 +209,26 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
 
                 <div className="grid grid-cols-7 gap-1">
                   {calendarDays.map((day, index) => {
-                    const dayStr = day.toISOString().split('T')[0];
+                    const year = day.getFullYear();
+                    const month = (day.getMonth() + 1).toString().padStart(2, '0');
+                    const dayNum = day.getDate().toString().padStart(2, '0');
+                    const dayStr = `${year}-${month}-${dayNum}`;
+                    
                     const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
-                    const isSelected = dayStr === selectedDate;
-                    const today = new Date();
-                    const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
-                    const isToday = dayStr === todayStr;
-                    const minDate = getMinDate();
-                    const isDisabled = minDate && dayStr < minDate;
+                    const isSelected = selectedDate === dayStr;
+                    const isToday = dayStr === todayString;
+                    
+                    // BASIT MANTIK: Sadece bugünden önceki günler disabled
+                    const isDisabled = dayStr < todayString;
+                    
+                    console.log('📅 Calendar day:', {
+                      dayNum: day.getDate(),
+                      dayStr,
+                      todayString,
+                      isDisabled,
+                      isSelected,
+                      isToday
+                    });
                     
                     return (
                       <button
@@ -205,8 +236,8 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
                         type="button"
                         onClick={() => {
                           if (!isDisabled) {
+                            console.log('🗓️ Clicking date:', dayStr, 'Day number:', day.getDate());
                             setSelectedDate(dayStr);
-                            console.log('Selected date:', dayStr);
                           }
                         }}
                         disabled={isDisabled}
@@ -214,7 +245,7 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
                           isSelected 
                             ? 'bg-blue-600 text-white' 
                             : isToday 
-                            ? 'bg-blue-100 text-blue-600 font-medium'
+                            ? 'bg-gray-100 text-gray-900 font-medium border border-blue-300'
                             : isCurrentMonth 
                             ? 'hover:bg-gray-100 text-gray-900' 
                             : 'text-gray-400'
@@ -231,81 +262,111 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-3">Time</h4>
                 
-                {/* Hour Selection */}
-                <div className="mb-4">
-                  <label className="block text-xs text-gray-600 mb-2">Hour</label>
-                  <div className="h-32 overflow-y-auto border border-gray-200 rounded bg-gray-50">
-                    {Array.from({ length: 24 }, (_, i) => {
-                      const hour = i.toString().padStart(2, '0');
-                      const isDisabled = isTimeDisabled(hour, selectedMinute || '00');
-                      
-                      return (
-                        <button
-                          key={hour}
-                          type="button"
-                          onClick={() => !isDisabled && setSelectedHour(hour)}
-                          disabled={isDisabled}
-                          className={`w-full px-3 py-1 text-left hover:bg-blue-50 transition-colors text-sm ${
-                            selectedHour === hour ? 'bg-blue-100 text-blue-600 font-medium' : 'text-gray-700'
-                          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                          {hour}:00
-                        </button>
-                      );
-                    })}
+                {/* Hour and Minute Selection - Side by Side */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Hour Selection */}
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-2">Hour</label>
+                    <div className="h-32 overflow-y-auto border border-gray-200 rounded bg-gray-50">
+                      {Array.from({ length: 24 }, (_, i) => {
+                        const hour = i.toString().padStart(2, '0');
+                        
+                        // Check if this hour is valid based on minimum datetime
+                        let isHourDisabled = false;
+                        if (selectedDate && minDateTime) {
+                          const selectedDateTime = `${selectedDate}T${hour}:00`;
+                          isHourDisabled = selectedDateTime < minDateTime;
+                        }
+                        return (
+                          <button
+                            key={hour}
+                            type="button"
+                            onClick={() => {
+                              if (!isHourDisabled) {
+                                setSelectedHour(hour);
+                              }
+                            }}
+                            disabled={isHourDisabled}
+                            className={`w-full px-2 py-1 text-center transition-colors text-sm ${
+                              isHourDisabled 
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
+                                : selectedHour === hour 
+                                ? 'bg-blue-100 text-blue-600 font-medium' 
+                                : 'text-gray-700 hover:bg-blue-50'
+                            }`}
+                          >
+                            {hour}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
 
-                {/* Minute Selection */}
-                <div>
-                  <label className="block text-xs text-gray-600 mb-2">Minute</label>
-                  <div className="grid grid-cols-2 gap-1">
-                    {['00', '15', '30', '45'].map((minute) => {
-                      const isDisabled = selectedHour ? isTimeDisabled(selectedHour, minute) : false;
-                      
-                      return (
-                        <button
-                          key={minute}
-                          type="button"
-                          onClick={() => !isDisabled && setSelectedMinute(minute)}
-                          disabled={isDisabled}
-                          className={`px-2 py-1 text-center rounded text-sm transition-colors ${
-                            selectedMinute === minute 
-                              ? 'bg-blue-600 text-white' 
-                              : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                          :{minute}
-                        </button>
-                      );
-                    })}
+                  {/* Minute Selection */}
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-2">Minute</label>
+                    <div className="h-32 overflow-y-auto border border-gray-200 rounded bg-gray-50">
+                      {['00', '15', '30', '45'].map((minute) => {
+                        // Check if this minute is valid based on minimum datetime
+                        let isMinuteDisabled = false;
+                        if (selectedDate && selectedHour && minDateTime) {
+                          const selectedDateTime = `${selectedDate}T${selectedHour}:${minute}`;
+                          isMinuteDisabled = selectedDateTime < minDateTime;
+                        }
+                        
+                        return (
+                          <button
+                            key={minute}
+                            type="button"
+                            onClick={() => {
+                              if (!isMinuteDisabled) {
+                                setSelectedMinute(minute);
+                              }
+                            }}
+                            disabled={isMinuteDisabled}
+                            className={`w-full px-2 py-1 text-center transition-colors text-sm ${
+                              isMinuteDisabled
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                                : selectedMinute === minute 
+                                ? 'bg-blue-600 text-white' 
+                                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                            }`}
+                          >
+                            :{minute}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Selected DateTime Display & Confirm */}
-            {selectedDate && selectedHour && selectedMinute && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="text-center mb-3">
-                  <p className="text-sm text-gray-600">Selected:</p>
-                  <p className="font-medium text-gray-900">
-                    {selectedDate && selectedHour && selectedMinute ? 
-                      `${selectedDate.split('-')[1]}/${selectedDate.split('-')[2]}/${selectedDate.split('-')[0]} at ${selectedHour}:${selectedMinute}` : 
-                      'No date selected'
-                    }
-                  </p>
-                </div>
-                
-                <button
-                  type="button"
-                  onClick={handleDateTimeSelect}
-                  className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
-                >
-                  Confirm Selection
-                </button>
+            {/* Selected DateTime Display & Confirm - Always Visible */}
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="text-center mb-3">
+                <p className="text-sm text-gray-600">Selected:</p>
+                <p className="font-medium text-gray-900">
+                  {selectedDate && selectedHour && selectedMinute ? 
+                    formatDisplayDateTime() : 
+                    'No date selected'
+                  }
+                </p>
               </div>
-            )}
+              
+              <button
+                type="button"
+                onClick={handleDateTimeSelect}
+                disabled={!selectedDate || !selectedHour || !selectedMinute}
+                className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${
+                  selectedDate && selectedHour && selectedMinute
+                    ? 'bg-red-600 text-white hover:bg-red-700'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Confirm Selection
+              </button>
+            </div>
           </div>
         </div>
       )}
