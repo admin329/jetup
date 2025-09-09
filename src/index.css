@@ -2,12 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* TARGETED STRIPE IFRAME REMOVAL - NO DESIGN BREAKING */
-iframe[name*="__privateStripe"],
-iframe[name*="__privateStripeController"],
-iframe[name*="__privateStripeMetricsController"],
-iframe[src*="stripe.com"],
-iframe[src*="js.stripe.com"] {
+/* TARGETED STRIPE IFRAME REMOVAL - FIXED VERSION */
+/* Only target Stripe-specific iframes with very specific selectors */
+iframe[src*="js.stripe.com"],
+iframe[src*="stripe.com/v3/"],
+iframe[name^="__privateStripe"],
+iframe[title*="Secure payment frame"] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -20,19 +20,21 @@ iframe[src*="js.stripe.com"] {
   pointer-events: none !important;
 }
 
-/* ENSURE MAIN CONTENT IS VISIBLE */
-#root {
-  position: relative !important;
-  z-index: 1 !important;
+/* MINIMAL VISIBILITY FIXES - NO AGGRESSIVE OVERRIDES */
+/* Only fix what's actually broken */
+body {
   display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
 }
 
-/* ALLOW ESSENTIAL IFRAMES */
+#root {
+  display: block !important;
+}
+
+/* ALLOW ESSENTIAL IFRAMES (NOT STRIPE) */
 iframe[src*="youtube.com"],
 iframe[src*="vimeo.com"],
-iframe[src*="maps.google.com"] {
+iframe[src*="maps.google.com"],
+iframe[src*="google.com/maps"] {
   display: block !important;
   position: relative !important;
   visibility: visible !important;
