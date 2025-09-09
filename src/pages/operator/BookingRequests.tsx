@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, MapPin, Calendar, Users, DollarSign, Check, X, AlertCircle, Send, Lock, Crown, Shield, Eye, Download, FileText, Building, Plane, Ban, Trash2, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Search, Filter, MapPin, Calendar, Users, DollarSign, Check, X, AlertCircle, Send, Lock, Crown, Shield, Eye, Download, FileText, Building, Plane, Ban, Trash2, Clock, CheckCircle, XCircle, Briefcase } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { generateInvoicePDF } from '../../types/invoice';
 
@@ -940,6 +940,26 @@ const BookingRequests: React.FC = () => {
                           </p>
                         </div>
                       </div>
+
+                      {selectedBooking.flightType && (
+                        <div className="flex items-center">
+                          <Briefcase className="h-5 w-5 text-gray-400 mr-3" />
+                          <div>
+                            <p className="text-sm text-gray-500">Flight Type</p>
+                            <p className="font-medium text-gray-900">{selectedBooking.flightType}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedBooking.aircraftRequest && (
+                        <div className="flex items-center">
+                          <Plane className="h-5 w-5 text-gray-400 mr-3" />
+                          <div>
+                            <p className="text-sm text-gray-500">Aircraft Request</p>
+                            <p className="font-medium text-gray-900">{selectedBooking.aircraftRequest}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
