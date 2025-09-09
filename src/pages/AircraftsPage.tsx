@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
 import Header from '../components/Header';
 import AircraftCard from '../components/AircraftCard';
+import CustomDropdown from '../components/CustomDropdown';
 import { useAuth } from '../contexts/AuthContext';
 
 const AircraftsPage: React.FC = () => {
@@ -187,18 +188,13 @@ const AircraftsPage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Country
                   </label>
-                  <select
+                  <CustomDropdown
                     value={selectedCountry}
                     onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
-                  >
-                    <option value="">All Countries</option>
-                    {countries.map((country) => (
-                      <option key={country} value={country}>
-                        {country}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedCountry}
+                    placeholder="All Countries"
+                    options={['', ...countries]}
+                  />
                 </div>
 
                 {/* Category Filter */}
@@ -206,18 +202,12 @@ const AircraftsPage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Aircraft Category
                   </label>
-                  <select
+                  <CustomDropdown
                     value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
-                  >
-                    <option value="">All Categories</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setSelectedCategory}
+                    placeholder="All Categories"
+                    options={['', ...categories]}
+                  />
                 </div>
               </div>
 
