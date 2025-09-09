@@ -2,10 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* STRONG Stripe iframe hiding */
+/* AGGRESSIVE Stripe iframe hiding - Fix for jetup.aero */
 iframe[name*="__privateStripe"],
 iframe[name*="__privateStripeController"],
-iframe[name*="__privateStripeMetricsController"] {
+iframe[name*="__privateStripeMetricsController"],
+iframe[src*="stripe.com"],
+iframe[src*="js.stripe.com"],
+iframe[title*="stripe"],
+iframe[id*="stripe"] {
   display: none !important;
   position: absolute !important;
   top: -10000px !important;
@@ -17,24 +21,33 @@ iframe[name*="__privateStripeMetricsController"] {
   opacity: 0 !important;
   pointer-events: none !important;
   overflow: hidden !important;
+  transform: translateX(-10000px) !important;
 }
 
-/* Main content always visible */
+/* Force main content visibility */
 #root {
   position: relative !important;
   z-index: 1000 !important;
-  background: white;
+  background: white !important;
+  min-height: 100vh !important;
+  width: 100% !important;
 }
 
-/* Body overflow control */
+/* Body and HTML control */
+html {
+  overflow-x: hidden !important;
+  position: relative !important;
+}
+
 body {
-  overflow-x: hidden;
-  position: relative;
+  overflow-x: hidden !important;
+  position: relative !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-/* Hide all Stripe iframes */
-iframe[src*="stripe.com"],
-iframe[src*="js.stripe.com"] {
+/* Nuclear option - hide ALL suspicious iframes */
+iframe:not([src*="youtube.com"]):not([src*="vimeo.com"]):not([src*="maps.google.com"]) {
   display: none !important;
   position: absolute !important;
   top: -10000px !important;
@@ -42,13 +55,17 @@ iframe[src*="js.stripe.com"] {
   width: 0 !important;
   height: 0 !important;
   visibility: hidden !important;
+  opacity: 0 !important;
+  z-index: -9999 !important;
 }
 
-/* Allow only important iframes */
+/* Allow only specific trusted iframes */
 iframe[src*="youtube.com"],
 iframe[src*="vimeo.com"],
 iframe[src*="maps.google.com"] {
   display: block !important;
   position: relative !important;
   visibility: visible !important;
+  opacity: 1 !important;
+  z-index: auto !important;
 }
