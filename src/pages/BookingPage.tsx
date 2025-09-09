@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Calendar, Users, Search, Plane, ArrowRight, MapPin, Lock, AlertTriangle, Crown, Clock } from 'lucide-react';
+import { Settings, Briefcase } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
 import AirportSelector from '../components/AirportSelector';
 import DateTimePicker from '../components/TimePicker';
+import CustomSelector from '../components/CustomSelector';
 import { getDiscountInfo } from '../utils/membershipUtils';
 import { getMinimumBookingTime, validateMinimumBookingTime, getTimezoneDisplayName, getCurrentTimeInAirportTimezone } from '../utils/timezoneUtils';
 
@@ -64,10 +66,12 @@ const BookingPage: React.FC = () => {
     to: urlTo,
     departure: urlDeparture,
     return: urlReturn,
-    passengers: urlPassengers,
+    passengers: 0,
     tripType: urlTripType as 'oneWay' | 'roundTrip',
     specialRequests: '',
-    discountRequested: false
+    discountRequested: false,
+    flightType: '',
+    aircraftRequest: ''
   });
 
   // Update minimum datetime when departure location changes
@@ -78,7 +82,14 @@ const BookingPage: React.FC = () => {
       
       const timezoneDisplay = getTimezoneDisplayName(formData.from);
       const currentAirportTime = getCurrentTimeInAirportTimezone(formData.from);
-      setTimezoneInfo(`${timezoneDisplay} - Current time: ${currentAirportTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`);
+      setTimezoneInfo(`${timezoneDisplay} - Current: ${currentAirportTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`);
+      
+      console.log('🕐 İSTANBUL BookingPage Debug:', {
+        from: formData.from,
+        currentTime: currentAirportTime.toLocaleString(),
+        minimumTime: new Date(minTime).toLocaleString(),
+        timezoneInfo
+      });
       
       // Clear departure time if it's now invalid
       if (formData.departure) {
@@ -168,13 +179,17 @@ const BookingPage: React.FC = () => {
   const handlePassengerChange = (increment: boolean) => {
     if (isBookingDisabled) return;
     
-    const newPassengers = increment ? formData.passengers + 1 : formData.passengers - 1;
-    if (newPassengers >= 1 && newPassengers <= 200) {
-      setFormData({
-        ...formData,
-        passengers: newPassengers
-      });
-    }
+    const currentPassengers = formData.passengers;
+    let newPassengers = increment ? currentPassengers + 1 : currentPassengers - 1;
+    
+    // Min 0, Max 200 sınırı
+    if (newPassengers < 0) newPassengers = 0;
+    if (newPassengers > 200) newPassengers = 200;
+    
+    setFormData({
+      ...formData,
+      passengers: newPassengers
+    });
   };
 
   const handleTripTypeChange = (type: 'oneWay' | 'roundTrip') => {
@@ -207,14 +222,34 @@ const BookingPage: React.FC = () => {
       return;
     }
     
-    // Validate required fields
-    if (!formData.from || !formData.to || !formData.departure) {
-      alert('Please fill in all required fields (From, To, Departure)');
+    // Validate required fields - more specific checks
+    if (!formData.from || !formData.from.trim()) {
+      alert('Please select departure airport (From)');
+      return;
+    }
+    
+    if (!formData.to || !formData.to.trim()) {
+      alert('Please select destination airport (To)');
+      return;
+    }
+    
+    if (!formData.departure || !formData.departure.trim()) {
+      alert('Please select departure date and time');
+      return;
+    }
+    
+    if (formData.passengers === 0) {
+      alert('Please select number of passengers');
+      return;
+    }
+    
+    if (!formData.flightType) {
+      alert('Please select a Flight Type');
       return;
     }
     
     if (formData.tripType === 'roundTrip' && !formData.return) {
-      alert('Please select a return date for round trip');
+      alert('Please select return date and time for round trip');
       return;
     }
     
@@ -242,7 +277,9 @@ const BookingPage: React.FC = () => {
       offers: [],
       rejectedByOperators: [],
       discountRequested: useDiscountOption,
-      customerMembershipType: user?.membershipType || 'basic'
+      customerMembershipType: user?.membershipType || 'basic',
+      flightType: formData.flightType,
+      aircraftRequest: formData.aircraftRequest
     };
     
     // Add to global state
@@ -264,7 +301,9 @@ const BookingPage: React.FC = () => {
       passengers: 1,
       tripType: 'oneWay',
       specialRequests: '',
-      discountRequested: false
+      discountRequested: false,
+      flightType: '',
+      aircraftRequest: ''
     });
   };
 
@@ -424,6 +463,18 @@ const BookingPage: React.FC = () => {
                         <span className="text-sm font-medium text-gray-700">Email:</span>
                         <span className="text-sm text-gray-900">{user?.email}</span>
                       </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-700">Flight Type:</span>
+                        <span className="text-sm text-gray-900">{formData.flightType}</span>
+                      </div>
+                      
+                      {formData.aircraftRequest && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-gray-700">Aircraft Request:</span>
+                          <span className="text-sm text-gray-900">{formData.aircraftRequest}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -607,12 +658,11 @@ const BookingPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Date and Passengers Row */}
-                <div className={`grid gap-6 ${formData.tripType === 'roundTrip' ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'}`}>
+                {/* Date Row */}
+                <div className={`grid gap-6 grid-cols-1 ${formData.tripType === 'roundTrip' ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
                   {/* Date & Time Combined */}
                   <div>
                     <DateTimePicker
-                      value={formData.departure.split('T')[1]?.substring(0, 5) || ''}
                       value={formData.departure}
                       onChange={(datetime) => {
                         if (datetime && formData.from) {
@@ -627,11 +677,18 @@ const BookingPage: React.FC = () => {
                           departure: datetime
                         });
                       }}
-                      placeholder={formData.tripType === 'oneWay' ? "Flight Date" : "Departure Date"}
+                      placeholder={formData.tripType === 'oneWay' ? 'Departure Date' : 'Departure Date'}
                       required
                       minDateTime={minimumDateTime}
                       timezoneInfo={timezoneInfo}
+                      fromLocation={formData.from}
+                      toLocation={formData.to}
                     />
+                    {timezoneInfo && (
+                      <p className="text-xs text-blue-600 mt-2">
+                        📍 {timezoneInfo}
+                      </p>
+                    )}
                   </div>
 
                   {/* Return Date & Time */}
@@ -645,7 +702,7 @@ const BookingPage: React.FC = () => {
                             return: datetime
                           });
                         }}
-                        placeholder="Return Flight Date"
+                        placeholder="Return Date"
                         required
                         minDateTime={formData.departure || minimumDateTime}
                         timezoneInfo={formData.to ? (() => {
@@ -653,7 +710,18 @@ const BookingPage: React.FC = () => {
                           const returnCurrentTime = getCurrentTimeInAirportTimezone(formData.to);
                           return `${returnTimezoneDisplay} - Current: ${returnCurrentTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
                         })() : undefined}
+                        fromLocation={formData.from}
+                        toLocation={formData.to}
                       />
+                      {formData.to && (
+                        <p className="text-xs text-blue-600 mt-2">
+                          📍 {(() => {
+                            const returnTimezoneDisplay = getTimezoneDisplayName(formData.to);
+                            const returnCurrentTime = getCurrentTimeInAirportTimezone(formData.to);
+                            return `${returnTimezoneDisplay} - Current: ${returnCurrentTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                          })()}
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -661,31 +729,64 @@ const BookingPage: React.FC = () => {
                   <div>
                     <div className="relative">
                       <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                      <div className="w-full pl-10 pr-20 py-4 border border-gray-300 rounded-xl bg-gray-50 flex items-center text-sm">
-                        <span className="flex-1 text-gray-900">{formData.passengers} {formData.passengers === 1 ? 'Passenger' : 'Passengers'}</span>
+                      <div className="w-full pl-10 pr-20 py-4 border border-gray-300 rounded-xl bg-gray-50 flex items-center">
+                        <span className={`text-sm ${formData.passengers === 0 ? 'text-gray-500' : 'text-gray-900'}`}>
+                          {formData.passengers === 0 ? 'Select passengers' : `${formData.passengers} ${formData.passengers === 1 ? 'Passenger' : 'Passengers'}`}
+                        </span>
                       </div>
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
                         <button
                           type="button"
                           onClick={() => handlePassengerChange(false)}
-                          disabled={formData.passengers <= 1}
-                          className="w-8 h-8 rounded-full bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed flex items-center justify-center text-black disabled:text-gray-400 font-bold"
+                          disabled={formData.passengers <= 0 || isBookingDisabled}
+                          className="w-8 h-8 rounded-full bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed flex items-center justify-center text-gray-700 disabled:text-gray-400 text-sm font-bold"
                         >
                           -
                         </button>
                         <button
                           type="button"
                           onClick={() => handlePassengerChange(true)}
-                          disabled={formData.passengers >= 200}
-                          className="w-8 h-8 rounded-full bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed flex items-center justify-center text-black disabled:text-gray-400 font-bold"
+                          disabled={formData.passengers >= 200 || isBookingDisabled}
+                          className="w-8 h-8 rounded-full bg-gray-300 hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed flex items-center justify-center text-gray-700 disabled:text-gray-400 text-sm font-bold"
                         >
                           +
                         </button>
                       </div>
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Those aged 18 and under are counted as passengers.
-                    </p>
+                    {formData.passengers > 0 && (
+                      <p className="text-xs text-blue-600 mt-2 flex items-center">
+                        <AlertTriangle className="h-3 w-3 mr-1 text-red-500" />
+                        Those aged 18 and under are counted as passengers.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Flight Type and Aircraft Request Row - Below Date and Passengers */}
+                <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+                  {/* Flight Type - Required */}
+                  <div>
+                    <CustomSelector
+                      value={formData.flightType}
+                      onChange={(value) => setFormData({ ...formData, flightType: value })}
+                      placeholder="Flight Type"
+                      options={['Private', 'Business', 'Group Charter', 'Government', 'Air Ambulance']}
+                      icon={<Briefcase className="h-4 w-4" />}
+                      required
+                      className={isBookingDisabled ? 'opacity-50 pointer-events-none' : ''}
+                    />
+                  </div>
+
+                  {/* Aircraft Request - Optional */}
+                  <div>
+                    <CustomSelector
+                      value={formData.aircraftRequest}
+                      onChange={(value) => setFormData({ ...formData, aircraftRequest: value })}
+                      placeholder="Aircraft Request (Optional)"
+                      options={['Helicopter', 'Turboprop', 'Light Jet', 'Mid-Size Jet', 'Super Mid-Size', 'Heavy Jet', 'Ultra Long Range', 'Airline']}
+                      icon={<Plane className="h-4 w-4" />}
+                      className={isBookingDisabled ? 'opacity-50 pointer-events-none' : ''}
+                    />
                   </div>
                 </div>
 
