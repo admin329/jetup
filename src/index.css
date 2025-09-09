@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Fix Stripe iframe overlay issue */
+iframe[name*="__privateStripe"] {
+  position: fixed !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  z-index: -1 !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Ensure main content is always visible */
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix any overlay issues */
+body {
+  overflow-x: hidden;
+}
+
+/* Prevent iframe interference */
+iframe:not([src*="youtube"]):not([src*="vimeo"]):not([src*="maps"]) {
+  max-width: 1px !important;
+  max-height: 1px !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  visibility: hidden !important;
+}
