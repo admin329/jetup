@@ -8,7 +8,7 @@ export const checkEmailSystemStatus = (): {
   hasApiKey: boolean;
   status: string;
 } => {
-  const apiKey = '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';
+  const apiKey = import.meta.env.SENDGRID_API_KEY || '';
   const templates = SENDGRID_TEMPLATES;
   
   return {
