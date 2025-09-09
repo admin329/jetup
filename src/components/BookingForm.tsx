@@ -5,6 +5,8 @@ import { Calendar, Users, Search, AlertCircle, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import AirportSelector from './AirportSelector';
 import { Crown } from 'lucide-react';
+import { getMinimumBookingTime, getTimezoneDisplayName, getCurrentTimeInAirportTimezone } from '../utils/timezoneUtils';
+import CustomDropdown from './CustomDropdown';
 
 interface BookingFormProps {
   onOpenAuthModal?: () => void;
@@ -13,6 +15,8 @@ interface BookingFormProps {
 const BookingForm: React.FC<BookingFormProps> = ({ onOpenAuthModal }) => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
+  const [timezoneInfo, setTimezoneInfo] = useState<string>('');
+  const [minimumDateTime, setMinimumDateTime] = useState<string>('');
   
   const [formData, setFormData] = useState({
     from: '',
@@ -22,6 +26,21 @@ const BookingForm: React.FC<BookingFormProps> = ({ onOpenAuthModal }) => {
     passengers: 1,
     tripType: 'oneWay'
   });
+
+  // Update minimum datetime when departure location changes
+  React.useEffect(() => {
+    if (formData.from) {
+      const minTime = getMinimumBookingTime(formData.from);
+      setMinimumDateTime(minTime);
+      
+      const timezoneDisplay = getTimezoneDisplayName(formData.from);
+      const currentAirportTime = getCurrentTimeInAirportTimezone(formData.from);
+      setTimezoneInfo(`${timezoneDisplay} - ${currentAirportTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`);
+    } else {
+      setMinimumDateTime('');
+      setTimezoneInfo('');
+    }
+  }, [formData.from]);
 
   // Check if user is operator or admin
   const isOperatorOrAdmin = user?.role === 'operator' || user?.role === 'admin';
@@ -63,7 +82,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onOpenAuthModal }) => {
   const canMakeBooking = !isOperatorOrAdmin && 
                         (user?.role === 'customer' ? user?.profileCompletionStatus === 'approved' : true) &&
                         membershipStatus.canBook;
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -123,7 +141,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ onOpenAuthModal }) => {
       passengers: newPassengers
     });
   };
-
   const handleTripTypeChange = (type: 'oneWay' | 'roundTrip') => {
     setFormData({
       ...formData,
@@ -196,8 +213,8 @@ const BookingForm: React.FC<BookingFormProps> = ({ onOpenAuthModal }) => {
           <div>
             <div className="relative">
               <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <div className="w-full pl-8 sm:pl-10 pr-16 sm:pr-20 py-4 border border-gray-200 rounded-xl bg-gray-50 text-xs sm:text-sm flex items-center">
-                <span className="flex-1">{formData.passengers} {formData.passengers === 1 ? 'Passenger' : 'Passengers'}</span>
+              <div className="w-full pl-10 pr-16 sm:pr-20 py-4 border border-gray-300 rounded-xl bg-gray-50 flex items-center">
+                <span className="flex-1 text-gray-500 text-sm placeholder-gray-500">{formData.passengers} {formData.passengers === 1 ? 'Passenger' : 'Passengers'}</span>
               </div>
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
                 <button
@@ -268,6 +285,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ onOpenAuthModal }) => {
                   >
                     Upgrade Now
                   </button>
+                  {timezoneInfo && (
+                    <p className="text-xs text-blue-600 mt-1">
+                      📍 {timezoneInfo}
+                    </p>
+                  )}
                 </div>
               </div>
             ) : (
