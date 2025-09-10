@@ -2,42 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-/* TARGETED STRIPE IFRAME REMOVAL - FIXED VERSION */
-/* Only target Stripe-specific iframes with very specific selectors */
-iframe[src*="js.stripe.com"],
-iframe[src*="stripe.com/v3/"],
-iframe[name^="__privateStripe"],
-iframe[title*="Secure payment frame"] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  position: absolute !important;
-  top: -99999px !important;
-  left: -99999px !important;
-  width: 0 !important;
-  height: 0 !important;
-  z-index: -99999 !important;
-  pointer-events: none !important;
+/* SAFE STRIPE IFRAME HIDING - NON-AGGRESSIVE VERSION */
+/* Only target very specific Stripe payment iframes */
+iframe[src*="js.stripe.com"][name*="__privateStripe"],
+iframe[src*="stripe.com/v3/"][title*="Secure payment frame"],
+iframe[name="__privateStripeFrame"],
+iframe[title="Secure card payment frame"] {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
-/* MINIMAL VISIBILITY FIXES - NO AGGRESSIVE OVERRIDES */
-/* Only fix what's actually broken */
-body {
-  display: block !important;
+/* ENSURE MAIN CONTENT VISIBILITY */
+/* Only apply to specific elements that need it */
+.min-h-screen,
+main,
+section,
+.container,
+.max-w-7xl {
+  display: block;
+  visibility: visible;
 }
 
-#root {
-  display: block !important;
-}
-
-/* ALLOW ESSENTIAL IFRAMES (NOT STRIPE) */
-iframe[src*="youtube.com"],
-iframe[src*="vimeo.com"],
-iframe[src*="maps.google.com"],
-iframe[src*="google.com/maps"] {
-  display: block !important;
-  position: relative !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 1 !important;
+/* ALLOW ALL LEGITIMATE IFRAMES */
+iframe:not([src*="js.stripe.com"]):not([name*="__privateStripe"]) {
+  display: block;
+  position: relative;
+  visibility: visible;
+  opacity: 1;
 }
