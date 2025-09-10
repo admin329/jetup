@@ -1,3 +1,43 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* TARGETED STRIPE IFRAME REMOVAL - FIXED VERSION */
+/* Only target Stripe-specific iframes with very specific selectors */
+iframe[src*="js.stripe.com"],
+iframe[src*="stripe.com/v3/"],
+iframe[name^="__privateStripe"],
+iframe[title*="Secure payment frame"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  top: -99999px !important;
+  left: -99999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  z-index: -99999 !important;
+  pointer-events: none !important;
+}
+
+/* MINIMAL VISIBILITY FIXES - NO AGGRESSIVE OVERRIDES */
+/* Only fix what's actually broken */
+body {
+  display: block !important;
+}
+
+#root {
+  display: block !important;
+}
+
+/* ALLOW ESSENTIAL IFRAMES (NOT STRIPE) */
+iframe[src*="youtube.com"],
+iframe[src*="vimeo.com"],
+iframe[src*="maps.google.com"],
+iframe[src*="google.com/maps"] {
+  display: block !important;
+  position: relative !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 1 !important;
+}
